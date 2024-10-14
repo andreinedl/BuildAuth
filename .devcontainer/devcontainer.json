@@ -3,8 +3,7 @@
 {
 	"name": "Ubuntu",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/devcontainers/templates/typescript-node:4.0.2",
-	"runArgs": ["--device=/dev/net/tun"],
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"features": {
 		"ghcr.io/devcontainers/features/java:latest": {
 			"installGradle": true,
@@ -24,10 +23,7 @@
 		},
 		"ghcr.io/akhildevelops/devcontainer-features/android-cli:latest": {
 			"PACKAGES": "platform-tools,platforms;android-33,build-tools;33.0.2"
-		},
-		"ghcr.io/tailscale/codespace/tailscale": {
-    		"version": "latest"
-  		}
+		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
