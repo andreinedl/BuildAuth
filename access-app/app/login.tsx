@@ -1,6 +1,5 @@
 import { View, NativeModules, Pressable } from "react-native"
 import { Text, Input, H1, H3, Button, Stack, XStack, YStack, Image } from "tamagui"
-import { Toast, useToastController, useToastState } from '@tamagui/toast'
 import { useTranslation } from 'react-i18next';
 import { router } from "expo-router";
 import { useState } from "react";
@@ -17,7 +16,6 @@ export default function LoginScreen() {
     const text = useTranslation().t
 
     function SignInComponent() {
-        const toast = useToastController()
         return (
             <YStack
                 gap="$3"
