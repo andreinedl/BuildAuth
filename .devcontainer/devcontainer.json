@@ -4,6 +4,7 @@
 	"name": "Ubuntu",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"runArgs": ["--device=/dev/net/tun"],
 	"features": {
 		"ghcr.io/devcontainers/features/java:latest": {
 			"installGradle": true,
@@ -18,6 +19,9 @@
 		"ghcr.io/devcontainers-contrib/features/meson-asdf:latest": {
 			"version": "latest"
 		},
+		"ghcr.io/tailscale/codespace/tailscale": {
+   		 	"version": "latest"
+  		},
 		"ghcr.io/balazs23/devcontainers-features/bazel:latest": {
 			"bazelisk": "latest"
 		},
