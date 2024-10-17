@@ -1,45 +1,75 @@
-import { View, NativeModules, Pressable } from "react-native"
-import { Text, Input, H1, H3, Button, Stack, XStack, YStack, Image } from "tamagui"
-import { useTranslation } from 'react-i18next';
+import { View, NativeModules, Pressable, KeyboardAvoidingView } from "react-native"
 import { router } from "expo-router";
 import { useState } from "react";
 import React from 'react'
-import { LogIn } from "@tamagui/lucide-icons";
+import { Surface } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
 //imports from local files
 
-import i18n from "./others/locale"
-import PasswordInput from "./others/PasswordInput"
+import PasswordInput from "./components/PasswordInput"
+import { theme } from "./theming/theme";
+import { Text } from "./components/Text"
+import LoginButton from "./components/LoginButton";
+import { i18n } from "./localization/locale";
 
 export default function LoginScreen() {
-    const [native, setNative] = React.useState(false)
-    const text = useTranslation().t
-
-    function SignInComponent() {
+    function LoginHeader() {
         return (
-            <YStack
-                gap="$3"
-                paddingTop="$4"
-            >
-                <Input placeholder={text('LoginUsernamePlaceholder')} minWidth={400} autoFocus={true} />
-                <PasswordInput />
+            <View style={{ justifyContent: "center", alignContent: "center", alignItems:"center", marginTop: "10%"}} >
+                <Text variant="displayMedium" textVariant="bold">
+                    {i18n.t('LoginGreetingH1')}
+                </Text>
+                <Text variant="titleLarge" textVariant="regular">
+                    {i18n.t('LoginGreetingH2')}
+                </Text>
+            </View>
+        )
+    }
 
-                <Button icon={LogIn}>
-                    {text('LoginButton')}
-                </Button>
-            </YStack>    
+    function LoginInputs() {
+        return (
+                <View style={{ 
+                    paddingTop: 20, 
+                    justifyContent: 'space-between',
+                    alignContent: "center", 
+                    alignItems: "center", 
+                    gap: 10 
+                }}>
+                    <TextInput 
+                        label={i18n.t('LoginUsernamePlaceholder')} 
+                        mode="outlined" 
+                        style={{ 
+                            width: "95%", 
+                            height: 55 
+                        }}
+                    />
+                    <PasswordInput label={i18n.t("LoginPasswordPlaceholder")} mode="outlined" 
+                        style={{ 
+                            width: "95%", 
+                            height: 55 
+                        }} />
+                </View>
         )
     }
 
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <H1>
-                {text('LoginGreetingH1')}
-            </H1>
-            <H3>
-                {text('LoginGreetingH2')}
-            </H3>
-            <SignInComponent />
+        <View style={{ backgroundColor: theme.colors.background, height: "100%", width: "100%", justifyContent: "center", alignItems: "center", flex: 1 }}>
+            <KeyboardAvoidingView style={{ flex: 1, justifyContent: "center", height: "100%", width: "100%"}}>
+            <Surface elevation={4} style={{
+                backgroundColor: theme.colors.surface,
+                width: "90%",
+                height: "auto", 
+                alignSelf: 'center',
+                borderRadius: 20,
+            }}>
+                <LoginHeader />
+                <LoginInputs /> 
+                <LoginButton label={i18n.t("LoginButton")} mode="contained" theme={{ roundness: 2 }} style={{ marginTop: 15, marginBottom: 20 }} labelStyle={{ fontSize: 15 }}/>
+            </Surface>
+            </KeyboardAvoidingView>
         </View>
     )
+
 }

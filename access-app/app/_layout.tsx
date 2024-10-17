@@ -1,27 +1,52 @@
-import { TamaguiProvider } from '@tamagui/core'
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import { View, NativeModules } from 'react-native'
+import { PaperProvider } from 'react-native-paper';
+import { View, NativeModules, Text } from 'react-native'
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { Stack, Redirect } from 'expo-router'
 import { useColorScheme } from 'react-native'
-import { useFonts } from 'expo-font'
+import { useEffect } from 'react';
+import { Raleway_400Regular, Raleway_700Bold, Raleway_700Bold_Italic, Raleway_400Regular_Italic } from '@expo-google-fonts/raleway';
+import { theme } from './theming/theme';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import LoginScreen from './login'
-import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 
-import { tamaguiConfig } from '../tamagui.config'
-
-import { Slot } from 'expo-router';
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme()
+
+  const [loaded, error] = useFonts({
+    'Raleway-Bold': Raleway_700Bold,
+    'Raleway-Italic': Raleway_400Regular_Italic,
+    'Raleway-BoldItalic': Raleway_700Bold_Italic,
+    'Raleway-Regular': Raleway_400Regular,
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  //Set NavigationBar color
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync(theme.colors.background);
+  }, []);
+
+  if (!loaded && !error) {
+    return null;
+  }
+
+  const backColor = theme.colors.background;
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
-      <ThemeProvider value={DarkTheme}>
-          <LinearGradient colors={['#181818', "#111111", 'transparent']} style={{ width: "100%", height: "100%" }}>
-            <LoginScreen />
-          </LinearGradient>
-      </ThemeProvider>
-    </TamaguiProvider>
+    <PaperProvider theme={theme}>
+      {/* Set statusbar color */}
+      <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
+        <SafeAreaView style={{ flex: 1 }}>
+          <LoginScreen />
+        </SafeAreaView>
+    </PaperProvider>
   )
 }
