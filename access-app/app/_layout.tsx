@@ -8,9 +8,13 @@ import { useEffect } from 'react';
 import { Raleway_400Regular, Raleway_700Bold, Raleway_700Bold_Italic, Raleway_400Regular_Italic } from '@expo-google-fonts/raleway';
 import { theme } from './theming/theme';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import LoginScreen from './login'
 import { StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
+
+//Import screens
+import HomeScreen from './screens/Home'
+import LoginScreen from './screens/Login'
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,10 +46,12 @@ export default function RootLayout() {
 
   return (
     <PaperProvider theme={theme}>
-      {/* Set statusbar color */}
-      <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
-        <SafeAreaView style={{ flex: 1 }}>
-          <LoginScreen />
+      {/* Set statusbar color */}   
+            
+        <SafeAreaView style={{ flex: 1 }}>       
+        <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
+          {/*<LoginScreen />*/}
+          <HomeScreen />
         </SafeAreaView>
     </PaperProvider>
   )

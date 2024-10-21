@@ -8,11 +8,11 @@ import { Button } from 'react-native-paper';
 
 //imports from local files
 
-import PasswordInput from "./components/PasswordInput"
-import { theme } from "./theming/theme";
-import { Text } from "./components/Text"
-import LoginButton from "./components/LoginButton";
-import { i18n } from "./localization/locale";
+import PasswordInput from "../components/PasswordInput"
+import { theme } from "../theming/theme";
+import { Text } from "../components/Text"
+import LoginButton from "../components/LoginButton";
+import { i18n } from "../localization/locale";
 
 export default function LoginScreen() {
     function LoginHeader() {

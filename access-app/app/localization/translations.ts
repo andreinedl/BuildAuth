@@ -5,6 +5,13 @@ export const translations = {
         LoginButton: 'Sign In',
         LoginUsernamePlaceholder: 'Username',
         LoginPasswordPlaceholder: 'Password',
+        HomeGreeting: 'Welcome back,',
+        CardText: 'You can hold your phone near the reader.',
+        UserInfo: 'User Info:',
+        AuthenticatedAs: 'You are authenticated as %{name}',
+        Username: "Username: %{username}",
+        LastAccess: 'Last access: %{lastUnlockTime}',
+        NfcDidabled: 'NFC is disabled',
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -12,5 +19,12 @@ export const translations = {
         LoginButton: 'Autentifică-te',
         LoginUsernamePlaceholder: 'Nume de utilizator',
         LoginPasswordPlaceholder: 'Parolă',
+        HomeGreeting: 'Bine ai revenit,',
+        CardText: 'Poti tine telefonul apropiat de cititor.',
+        UserInfo: 'Informatii utilizator:',
+        AuthenticatedAs: 'Esti autentificat ca %{name}',
+        Username: "Nume de utilizator: %{username}",
+        LastAccess: 'Ultimul acces : %{lastUnlockTime}',
+        NfcDisabled: 'NFC este dezactivat',
     }
 }
