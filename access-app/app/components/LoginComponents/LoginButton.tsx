@@ -1,6 +1,6 @@
 import { Button, Icon } from 'react-native-paper';
 import { View } from 'react-native';
-import { theme } from '../theming/theme';
+import { theme } from '../../theming/theme';
 
 export default function LoginButton(props) {
     return (

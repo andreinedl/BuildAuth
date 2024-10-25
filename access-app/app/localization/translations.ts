@@ -11,7 +11,7 @@ export const translations = {
         AuthenticatedAs: 'You are authenticated as %{name}',
         Username: "Username: %{username}",
         LastAccess: 'Last access: %{lastUnlockTime}',
-        NfcDidabled: 'NFC is disabled',
+        NfcDisabled: 'NFC is disabled',
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',

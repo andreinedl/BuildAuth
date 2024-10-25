@@ -5,55 +5,16 @@ import React from 'react'
 import { Surface } from 'react-native-paper';
 import { TextInput } from 'react-native-paper';
 import { Button } from 'react-native-paper';
-
-//imports from local files
-
-import PasswordInput from "../components/PasswordInput"
 import { theme } from "../theming/theme";
-import { Text } from "../components/Text"
-import LoginButton from "../components/LoginButton";
 import { i18n } from "../localization/locale";
 
+//import components
+
+import LoginHeader from "../components/LoginComponents/LoginHeader";
+import LoginInputs from "../components/LoginComponents/LoginInputs";
+import LoginButton from "../components/LoginComponents/LoginButton";
+
 export default function LoginScreen() {
-    function LoginHeader() {
-        return (
-            <View style={{ justifyContent: "center", alignContent: "center", alignItems:"center", marginTop: "10%"}} >
-                <Text variant="displayMedium" textVariant="bold">
-                    {i18n.t('LoginGreetingH1')}
-                </Text>
-                <Text variant="titleLarge" textVariant="regular">
-                    {i18n.t('LoginGreetingH2')}
-                </Text>
-            </View>
-        )
-    }
-
-    function LoginInputs() {
-        return (
-                <View style={{ 
-                    paddingTop: 20, 
-                    justifyContent: 'space-between',
-                    alignContent: "center", 
-                    alignItems: "center", 
-                    gap: 10 
-                }}>
-                    <TextInput 
-                        label={i18n.t('LoginUsernamePlaceholder')} 
-                        mode="outlined" 
-                        style={{ 
-                            width: "95%", 
-                            height: 55 
-                        }}
-                    />
-                    <PasswordInput label={i18n.t("LoginPasswordPlaceholder")} mode="outlined" 
-                        style={{ 
-                            width: "95%", 
-                            height: 55 
-                        }} />
-                </View>
-        )
-    }
-
     return (
         <View style={{ backgroundColor: theme.colors.background, height: "100%", width: "100%", justifyContent: "center", alignItems: "center", flex: 1 }}>
             <KeyboardAvoidingView style={{ flex: 1, justifyContent: "center", height: "100%", width: "100%"}}>
