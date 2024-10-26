@@ -27,6 +27,7 @@
       "expo-router",
       "expo-font",
       "expo-localization",
+      "react-native-nfc-manager",
       ["expo-build-properties",
         {
           "android": {

@@ -4,7 +4,6 @@ import { theme } from '../theming/theme'
 
 //Import components
 import Header from '../components/HomeComponents/HomeHeader'
-import NFCTooltip from '../components/HomeComponents/NFCTooltip'
 import AccessCard from '../components/HomeComponents/AccessCard'
 import UserInfo from '../components/HomeComponents/UserInfo'
 
@@ -19,7 +18,6 @@ export default function Home() {
                 borderRadius: 20,
             }}>
                 <Header />
-                <NFCTooltip />
                 <AccessCard />
                 <UserInfo />
             </Surface>

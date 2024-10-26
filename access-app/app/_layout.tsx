@@ -11,9 +11,7 @@ import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 
-//Import screens
-import HomeScreen from './screens/Home'
-import LoginScreen from './screens/Login'
+import TabLayout from './tabs/_layout';
 
 
 SplashScreen.preventAutoHideAsync();
@@ -51,7 +49,7 @@ export default function RootLayout() {
         <SafeAreaView style={{ flex: 1 }}>       
         <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
           {/*<LoginScreen />*/}
-          <HomeScreen />
+          <TabLayout />
         </SafeAreaView>
     </PaperProvider>
   )
