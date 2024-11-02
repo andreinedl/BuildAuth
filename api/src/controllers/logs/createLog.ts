@@ -12,7 +12,9 @@ export async function createLog(req: Request, res: Response, next: NextFunction)
         const message = req.body.message
 
         if (!username || !message) {
-            res.status(400).send('Missing required fields, required fields are: username, message')
+            res.status(400).json({
+                message: 'Missing required fields, required fields are: username, message'
+            })
             return;
         }
        

@@ -23,11 +23,11 @@ export async function getLogs(req: Request, res: Response, next: NextFunction) {
             const logs = await Log.findAll({ where: { username: user?.getDataValue('username') }})
             res.json(logs)        
         } else {
-            res.status(400).json({
+            res.status(404).json({
                 message: 'User not found'
             })
         }
-        
+
     } catch (error) {
         next(error)
     }

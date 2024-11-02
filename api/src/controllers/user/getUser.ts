@@ -13,7 +13,9 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
     const user = await User.findOne({where: { username: username }})
 
     if(user === null) {
-        res.status(404).send('User not found')
+        res.status(404).json({ 
+            message: 'User not found'
+        })
     } else {
         await User.findOne({where: { username: username }}).then((user) => {
             res.json({

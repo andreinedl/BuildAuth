@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction} from 'express';
 import { User } from '../../database/models/User';
+import { hashSync } from 'bcrypt';
 
 export async function createUser(req: Request, res: Response, next: NextFunction) {
     try {
@@ -14,14 +15,18 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         const admin = req.body.admin
 
         if (!username || !password || !firstName || !lastName || !allowed || !admin) {
-            res.status(400).send('Missing required fields, required fields are: username, password, firstName, lastName, allowed, admin')
+            res.status(400).json({
+                message: 'Missing required fields, required fields are: username, password, firstName, lastName, allowed, admin'
+            })
             return;
         }
+
+        const hashedPassword = await hashSync(password, 10) // 10 = salt number // https://escape.tech/blog/how-to-secure-express-js-api/
        
         // create user in DB
         const user = User.build({
             username,
-            password,
+            password: `${hashedPassword}`,
             firstName,
             lastName,
             allowed,

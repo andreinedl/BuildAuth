@@ -4,6 +4,7 @@ import express, { Router } from 'express';
 import { createUser } from '../controllers/user/createUser';
 import { deleteUser } from '../controllers/user/deleteUser';
 import { getUserInfo } from '../controllers/user/getUser';
+import { auth } from '../controllers/user/auth';
 
 //define router
 const router = Router();
@@ -12,6 +13,7 @@ const router = Router();
 router.post('/create', createUser);
 router.post('/delete', deleteUser);
 router.get('/', getUserInfo);
+router.post('/auth', auth)
 
 //export router
 export let userRouter = router;
