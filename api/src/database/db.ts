@@ -1,6 +1,9 @@
 import { Sequelize, Model } from 'sequelize'
 export const database = new Sequelize('db', 'app', 'password', {
     dialect: 'mariadb',
+    dialectOptions: {
+        timezone: 'Europe/Bucharest',
+    },
     timezone: 'Europe/Bucharest',
     logging: false,
     pool: {

@@ -35,6 +35,9 @@ export const User = database.define('user',
         lastAccess: {
             type: DataTypes.DATE,
             allowNull: true,
+            set(value) {
+                this.setDataValue('lastAccess', value)
+            }
         }
     }, 
     {

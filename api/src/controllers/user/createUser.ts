@@ -14,7 +14,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         const admin = req.body.admin
 
         if (!username || !password || !firstName || !lastName || !allowed || !admin) {
-            res.status(400)
+            res.status(400).send('Missing required fields, required fields are: username, password, firstName, lastName, allowed, admin')
             return;
         }
        

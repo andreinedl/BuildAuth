@@ -5,7 +5,8 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
     console.log(req.body)
     const username = req.body.username    
     if(!username) {
-        res.status(400).send('Missing required fields')
+        const users = await User.findAll()
+        res.json(users)
         return;
     }
 

@@ -8,7 +8,7 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
         )
         const username = req.body.username
         if(!username) {
-            res.status(400).send('Missing required fields')
+            res.status(400).send('Missing required fields: username')
             return;
         }
 
