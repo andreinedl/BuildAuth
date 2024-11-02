@@ -10,9 +10,11 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         const password = req.body.password
         const firstName = req.body.firstName
         const lastName = req.body.lastName
+        const allowed = req.body.allowed
+        const admin = req.body.admin
 
-        if (!username || !password || !firstName || !lastName) {
-            res.status(400).send('Missing required fields')
+        if (!username || !password || !firstName || !lastName || !allowed || !admin) {
+            res.status(400)
             return;
         }
        
@@ -21,7 +23,9 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             username,
             password,
             firstName,
-            lastName
+            lastName,
+            allowed,
+            admin
         });
 
         // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/

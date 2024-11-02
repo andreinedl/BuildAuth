@@ -16,9 +16,11 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
     } else {
         await User.findOne({where: { username: username }}).then((user) => {
             res.json({
-                firstName: user?.get('firstName'),
-                lastName: user?.get('lastName'),
-                lastAccess: user?.get('lastAccess')
+                firstName: user?.getDataValue('firstName'),
+                lastName: user?.getDataValue('lastName'),
+                lastAccess: user?.getDataValue('lastAccess'),
+                allowed: user?.getDataValue('allowed'),
+                admin: user?.getDataValue('admin')
             })
         })
     }
