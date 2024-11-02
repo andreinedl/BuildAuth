@@ -5,7 +5,7 @@ import { userInfo } from '../../api/user'
 
 export default function Header() {
     return (
-        <View style={{ justifyContent: "center" , alignContent: "center", marginTop: 10, marginLeft: 15}}>
+        <View style={{ justifyContent: "center" , alignContent: "center", marginTop: 20, marginLeft: 15}}>
             <Text variant='headlineLarge' textVariant='bold'>
                 {i18n.t('HomeGreeting', {name: userInfo.firstName })}
             </Text>
