@@ -2,6 +2,11 @@ import { Sequelize, Model } from 'sequelize'
 export const database = new Sequelize('db', 'app', 'password', {
     dialect: 'mariadb',
     logging: false,
+    pool: {
+        max: 5,
+        idle: 30000,
+        acquire: 60000,
+    },
 })
 
 import { User } from './models/User'
@@ -20,15 +25,19 @@ export async function initDb() {
 
     await connect()
 
+    let connectionStatus = false // define false by default
     async function checkConnectionStatus() {
-       console.log('Current connection status:', await connect() ? 'Connected' : 'Disconnected');
+        let connectionStatus = await connect()
+       if(connectionStatus == false){
+           console.log('MariaDB connection lost, trying to reconnect...')
+       }
     }
 
     // check @ 10 seconds
     setInterval(checkConnectionStatus, 10000)
 
     //sync models
-    await User.sync({force: true});
-    await Log.sync({force: true});
+    await User.sync();
+    await Log.sync();
     
 }
