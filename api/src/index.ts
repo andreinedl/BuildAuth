@@ -1,10 +1,10 @@
 import express, { Request as req, Response as res } from 'express';
-import { tryConnection } from './database/db';
+import { initDb } from './database/db';
 
 const app = express()
 const port = 3000
 
-tryConnection();
+initDb();
 
 app.get('/', (req, res) => { 
     res.send('Hello World!')

@@ -1,24 +1,34 @@
-const { Sequelize } = require('sequelize');
-const db = new Sequelize('mariadb://app:password@localhost:3306/db');
+import { Sequelize, Model } from 'sequelize'
+export const database = new Sequelize('db', 'app', 'password', {
+    dialect: 'mariadb',
+    logging: false,
+})
 
-export async function tryConnection() {
-    try {
-        await db.authenticate();
-        return true;
-    } catch (error) {
-        return false;
+import { User } from './models/User'
+import { Log } from './models/Log';
+
+export async function initDb() {
+    async function connect() {
+        try {
+            await database.authenticate();
+            return true
+        } catch (error) {
+            console.error('Unable to connect to the database:', error);
+            return false
+        }
     }
+
+    await connect()
+
+    async function checkConnectionStatus() {
+       console.log('Current connection status:', await connect() ? 'Connected' : 'Disconnected');
+    }
+
+    // check @ 10 seconds
+    setInterval(checkConnectionStatus, 10000)
+
+    //sync models
+    await User.sync({force: true});
+    await Log.sync({force: true});
+    
 }
-
-let connectionStatus = false;
-
-async function checkConnectionStatus() {
-    connectionStatus = await tryConnection();
-    console.log('Current connection status:', connectionStatus ? 'Connected' : 'Disconnected');
-}
-
-// Check connection status every 10 seconds
-setInterval(checkConnectionStatus, 10000);
-
-// Initial check
-checkConnectionStatus();
