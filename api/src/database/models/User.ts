@@ -10,7 +10,10 @@ export const User = database.define('user',
         },
         username: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            get() {
+                return this.getDataValue('username');
+            },
         },
         password: {
             type: DataTypes.STRING,
@@ -18,15 +21,24 @@ export const User = database.define('user',
         },
         firstName: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            get() {
+                return this.getDataValue('firstName');
+            },
         },
         lastName: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            get() {
+                return this.getDataValue('lastName');
+            },
         },
         lastAccess: {
             type: DataTypes.DATE,
-            allowNull: true
+            allowNull: true,
+            get() {
+                return this.getDataValue('lastAccess');
+            },
         }
     }, 
     {

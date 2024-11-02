@@ -24,6 +24,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             lastName
         });
 
+        // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/
         if(await User.findOne({where: { username: username }}) === null) {
             await user.save().then(() => {
                 res.status(201).send('User created')

@@ -12,6 +12,7 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
             return;
         }
 
+        //https://sequelize.org/docs/v6/core-concepts/model-querying-finders/
         if(await User.findOne({where: { username: username }}) === null) {
             res.status(409).send('User not found')
         } else {

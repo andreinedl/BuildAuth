@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { initDb } from './database/db';
-import { router } from '../src/routes/UserRoute';
+import { userRouter } from '../src/routes/UserRoute';
 
 const app = express()
 const port = 3000
@@ -12,6 +12,6 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!')
 })
 
-app.use('/users', router)
+app.use('/users', userRouter)
 
 app.listen(port, () => console.log(`Running on ${port}!`))
