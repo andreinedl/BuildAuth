@@ -10,15 +10,20 @@
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "mariadb": "^3.4.0",
-    "sequelize": "6.37.5"
+    "mysql2": "^3.11.4",
+    "sequelize": "6.37.5",
+    "express-requests-logger": "4.0.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.6",
-    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express-requests-logger": "^4.0.0",
     "ts-node": "10.9.2",
     "typescript": "~5.6.3"
   },

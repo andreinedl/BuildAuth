@@ -1,18 +1,21 @@
 import { PaperProvider } from 'react-native-paper';
-import { View, NativeModules, Text } from 'react-native'
+import { View, NativeModules, Text, useColorScheme, StatusBar } from 'react-native'
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { Stack, Redirect } from 'expo-router'
-import { useColorScheme } from 'react-native'
 import { useEffect } from 'react';
 import { Raleway_400Regular, Raleway_700Bold, Raleway_700Bold_Italic, Raleway_400Regular_Italic } from '@expo-google-fonts/raleway';
 import { theme } from './theming/theme';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'react-native';
+import { ToastProvider } from 'react-native-paper-toast';
 import * as NavigationBar from 'expo-navigation-bar';
 
-import TabLayout from './tabs/_layout';
+//Screens
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import LoginScreen from './(auth)/Login';
+import TabLayout from './(tabs)/_layout';
+import { AuthProvider } from './contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,14 +45,24 @@ export default function RootLayout() {
 
   const backColor = theme.colors.background;
 
+  const Stack = createNativeStackNavigator();
+
   return (
     <PaperProvider theme={theme}>
       {/* Set statusbar color */}   
-            
+
         <SafeAreaView style={{ flex: 1 }}>       
         <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
-          {/*<LoginScreen />*/}
-          <TabLayout />
+          <ToastProvider>
+            <AuthProvider>
+              <NavigationContainer independent={true}>
+                <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
+                  <Stack.Screen name="Login" component={LoginScreen} />
+                  <Stack.Screen name="Home" component={TabLayout} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </AuthProvider>
+          </ToastProvider>
         </SafeAreaView>
     </PaperProvider>
   )

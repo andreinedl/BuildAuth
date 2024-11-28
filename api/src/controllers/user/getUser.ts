@@ -2,11 +2,19 @@ import express, { Request, Response, NextFunction} from 'express';
 import { User } from '../../database/models/User';
 
 export async function getUserInfo(req: Request, res: Response, next: NextFunction) {
-    console.log(req.body)
     const username = req.body.username    
     if(!username) {
         const users = await User.findAll()
-        res.json(users)
+        const usersInfo = users.map((user) => {
+            return {
+                firstName: user.getDataValue('firstName'),
+                lastName: user.getDataValue('lastName'),
+                lastAccess: user.getDataValue('lastAccess'),
+                allowed: user.getDataValue('allowed'),
+                admin: user.getDataValue('admin')
+            }
+        })
+        res.json(usersInfo)
         return;
     }
 

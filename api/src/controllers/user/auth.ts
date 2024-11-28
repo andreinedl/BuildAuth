@@ -25,7 +25,15 @@ export async function auth(req: Request, res : Response, next: NextFunction) {
         // comparesync example from https://github.com/Mister-Hope/bcrypt-ts
         if(compareSync(password, user?.getDataValue('password')) == true) {
             res.status(200).json({
-                message: "Authenticated."
+                message: "Authenticated.",
+                userInfo: {
+                    username: user?.getDataValue('username'),
+                    email: user?.getDataValue('email'),
+                    lastAccess: user?.getDataValue('lastAccess'),
+                    allowed: user?.getDataValue('allowed'),
+                    firstName: user?.getDataValue('firstName'),
+                    lastName: user?.getDataValue('lastName'),
+                }
             })
         } else {
             res.status(401).json({
