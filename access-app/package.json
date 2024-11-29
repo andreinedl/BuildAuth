@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "build-android": "npx expo prebuild && cd android && ./gradlew assembleRelease"
+    "build-android": "npx expo prebuild && cd android && .\\gradlew assembleRelease"
   },
   "dependencies": {
     "@expo-google-fonts/raleway": "^0.2.3",

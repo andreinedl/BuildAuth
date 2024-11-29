@@ -15,6 +15,11 @@ export const translations = {
         NfcNotSupportedText: 'NFC is not supported on this device',
         HomeTab: 'Home',
         UserInfoTab: 'User Info',
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        email: 'Email',
+        logout: 'Logout',
+        username: 'Username',
 
     },
     ro: {
@@ -33,5 +38,10 @@ export const translations = {
         NfcNotSupportedText: 'NFC nu este suportat pe acest dispozitiv',
         HomeTab: 'Acasă',
         UserInfoTab: 'Informații utilizator',
+        firstName: 'Prenume',
+        lastName: 'Nume',
+        email: 'Email',
+        logout: 'Deconectare',
+        username: 'Nume de utilizator',
     }
 }

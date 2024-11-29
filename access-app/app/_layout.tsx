@@ -8,14 +8,10 @@ import { theme } from './theming/theme';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastProvider } from 'react-native-paper-toast';
 import * as NavigationBar from 'expo-navigation-bar';
-
-//Screens
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import LoginScreen from './(auth)/Login';
-import TabLayout from './(tabs)/_layout';
 import { AuthProvider } from './contexts/AuthContext';
+
+//import stack screens
+import Stack from './Stack';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,8 +41,6 @@ export default function RootLayout() {
 
   const backColor = theme.colors.background;
 
-  const Stack = createNativeStackNavigator();
-
   return (
     <PaperProvider theme={theme}>
       {/* Set statusbar color */}   
@@ -55,12 +49,7 @@ export default function RootLayout() {
         <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
           <ToastProvider>
             <AuthProvider>
-              <NavigationContainer independent={true}>
-                <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
-                  <Stack.Screen name="Login" component={LoginScreen} />
-                  <Stack.Screen name="Home" component={TabLayout} />
-                </Stack.Navigator>
-              </NavigationContainer>
+              <Stack />
             </AuthProvider>
           </ToastProvider>
         </SafeAreaView>

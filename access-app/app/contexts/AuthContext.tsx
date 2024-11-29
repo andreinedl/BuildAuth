@@ -5,6 +5,7 @@ import { config } from '../config';
 
 interface AuthType {
     login: (username: string, password: string) => Promise<boolean>;
+    logout: () => void;
     user: {
         username: string;
         email: string;
@@ -14,9 +15,10 @@ interface AuthType {
         lastName: string;
     };
     isLoading: boolean;
+    isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<Partial<AuthType>>({});
+const AuthContext = createContext<AuthType>(undefined);
 
 export const useAuth = () => {
 	return useContext(AuthContext);
@@ -33,20 +35,20 @@ export const AuthProvider = ({ children }: any) => {
     }
 
     const [user, setUser] = React.useState(userInfo);
+    const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
 
     const login = async (username: string, password: string): Promise<boolean> => {
         try {
-            const response = await axios.post(`${config.apiUrlLocal}/users/auth`, {
+            const response = await axios.post(`${config.apiUrl}/users/auth`, {
                 username: username,
                 password: password
             });
             if (response.status === 200) {
-                console.log(response)
                 setUser(response.data.userInfo);
+                setAuthenticated(true);
                 return true;
             } else {
-                console.log(response)
                 return false;
             }
         } catch (error) {
@@ -55,8 +57,19 @@ export const AuthProvider = ({ children }: any) => {
         }
     }
 
+    const logout = async () => {
+        try {
+            setUser(userInfo);
+            setAuthenticated(false);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const value = {
+        isAuthenticated,
 		login,
+        logout,
         user,
         isLoading
 	};
