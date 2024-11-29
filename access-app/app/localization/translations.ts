@@ -20,7 +20,10 @@ export const translations = {
         email: 'Email',
         logout: 'Logout',
         username: 'Username',
-
+        APIUnreachable: 'API Unreachable',
+        LoginSuccess: 'Login successful',
+        LoginFailed: 'Invalid credentials',
+        UnknownError: 'Unknown error',
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -43,5 +46,9 @@ export const translations = {
         email: 'Email',
         logout: 'Deconectare',
         username: 'Nume de utilizator',
+        APIUnreachable: 'API Inaccesibil',
+        LoginSuccess: 'Te-ai autentificat cu succes',
+        LoginFailed: 'Date de conectare invalide',
+        UnknownError: 'Eroare necunoscută',
     }
 }

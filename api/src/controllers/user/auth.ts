@@ -15,15 +15,15 @@ export async function auth(req: Request, res : Response, next: NextFunction) {
         }
 
         const user = await User.findOne({ where: { username: username }})
-        if(!username) {
-            res.status(404).json({
-                message: "User not found"
+        if(!user) {
+            res.status(401).json({
+                message: "Invalid credentials."
             })
             return
         }
 
         // comparesync example from https://github.com/Mister-Hope/bcrypt-ts
-        if(compareSync(password, user?.getDataValue('password')) == true) {
+        if(compareSync(password, user?.getDataValue('password'))) {
             res.status(200).json({
                 message: "Authenticated.",
                 userInfo: {
@@ -42,6 +42,9 @@ export async function auth(req: Request, res : Response, next: NextFunction) {
         }
 
     } catch (error) {
-        next(error)
+        console.error("Authentication error:", error);
+        res.status(500).json({
+            message: "Internal server error"
+        });
     }
 }

@@ -1,5 +1,5 @@
 // access-app/app/login/Login.tsx
-import { View, KeyboardAvoidingView } from "react-native";
+import { View, KeyboardAvoidingView, Keyboard } from "react-native";
 import { useContext, useState } from "react";
 import { Surface } from 'react-native-paper';
 import { theme } from "../theming/theme";
@@ -17,15 +17,18 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState("");
 
     async function loginAction() {
+        Keyboard.dismiss();
         await login(username, password).then((response) => {
             console.log(response)
-            if(response) {
-                toast.show({ message: "Login successful", duration: 2000, type: 'success' });
+            if(response == "authenticated") {
+                toast.show({ message: i18n.t('LoginSuccess'), duration: 2000, type: 'success' });
                 navigation.navigate("Home");
-                console.log("Login successful");
+            } else if(response == "timeout") {
+                toast.show({ message: i18n.t('APIUnreachable'), duration: 2000, type: 'error'});
+            } else if(response == "failed") {
+                toast.show({ message: i18n.t('LoginFailed'), duration: 2000, type: 'error'});
             } else {
-                toast.show({ message: 'Invalid credentials', duration: 2000, type: 'error'});
-                console.log("Login failed");
+                toast.show({ message: i18n.t('UnknownError'), duration: 2000, type: 'error'});
             }
         })
     }

@@ -1,10 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { createContext, useContext } from "react";
+import Spinner from 'react-native-loading-spinner-overlay';
+import { ActivityIndicator } from 'react-native-paper';
 import { config } from '../config';
 
 interface AuthType {
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (username: string, password: string) => Promise<String>;
     logout: () => void;
     user: {
         username: string;
@@ -37,23 +38,27 @@ export const AuthProvider = ({ children }: any) => {
     const [user, setUser] = React.useState(userInfo);
     const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
+    const [loginMessage, setLoginMessage] = React.useState('');
 
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (username: string, password: string): Promise<String> => {
         try {
+            setLoading(true);
             const response = await axios.post(`${config.apiUrl}/users/auth`, {
                 username: username,
                 password: password
-            });
-            if (response.status === 200) {
-                setUser(response.data.userInfo);
-                setAuthenticated(true);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            console.log(error);
-            return false;
+            }, { timeout: 5000 })
+            setUser(response.data.userInfo);
+            setAuthenticated(true);
+            setLoading(false);
+            return "authenticated";
+        } catch(error) {
+            if (!error.response) {
+                setLoading(false);
+                return "timeout";
+              } else {
+                setLoading(false);
+                return "failed";
+              }
         }
     }
 
@@ -71,12 +76,14 @@ export const AuthProvider = ({ children }: any) => {
 		login,
         logout,
         user,
-        isLoading
+        isLoading, 
+        loginMessage
 	};
 
     return (
         <AuthContext.Provider value={value}>
             {children}
+            <Spinner visible={isLoading}/>
         </AuthContext.Provider>
     )
 }
