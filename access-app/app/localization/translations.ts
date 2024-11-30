@@ -24,6 +24,7 @@ export const translations = {
         LoginSuccess: 'Login successful',
         LoginFailed: 'Invalid credentials',
         UnknownError: 'Unknown error',
+        EmptyFields: "The fields can not be empty"
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -50,5 +51,6 @@ export const translations = {
         LoginSuccess: 'Te-ai autentificat cu succes',
         LoginFailed: 'Date de conectare invalide',
         UnknownError: 'Eroare necunoscută',
+        EmptyFields: "Câmpurile nu pot fi goale"
     }
 }

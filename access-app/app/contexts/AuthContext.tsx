@@ -17,6 +17,11 @@ interface AuthType {
     };
     isLoading: boolean;
     isAuthenticated: boolean;
+    logs: Array<{
+        username: string;
+        timestamp: string;
+        message: string;
+    }>;
 }
 
 const AuthContext = createContext<AuthType>(undefined);
@@ -35,10 +40,17 @@ export const AuthProvider = ({ children }: any) => {
         lastName: '',
     }
 
+    let log = {
+        username: '',
+        timestamp: '',
+        message: '',
+    }
+
     const [user, setUser] = React.useState(userInfo);
     const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState('');
+    const [logs, setLogs] = React.useState(Array<typeof log>);
 
     const login = async (username: string, password: string): Promise<String> => {
         try {
@@ -49,6 +61,7 @@ export const AuthProvider = ({ children }: any) => {
             }, { timeout: 5000 })
             setUser(response.data.userInfo);
             setAuthenticated(true);
+            getLogs()
             setLoading(false);
             return "authenticated";
         } catch(error) {
@@ -71,13 +84,26 @@ export const AuthProvider = ({ children }: any) => {
         }
     }
 
+    const getLogs = async() => {
+        const response = await axios.get(`${config.apiUrl}/logs/`, { timeout: 5000 })
+        let logsData = response.data.map(log => {
+            return {
+                username: log.username,
+                timestamp: log.timestamp,
+                message: log.message,
+            }
+        })
+        setLogs(logsData);
+    }
+
     const value = {
         isAuthenticated,
 		login,
         logout,
         user,
         isLoading, 
-        loginMessage
+        loginMessage,
+        logs
 	};
 
     return (

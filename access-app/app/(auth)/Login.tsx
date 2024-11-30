@@ -18,6 +18,11 @@ export default function LoginScreen({ navigation }) {
 
     async function loginAction() {
         Keyboard.dismiss();
+        if(username == "" || password == "") {
+            toast.show({ message: i18n.t('EmptyFields'), duration: 2000, type: 'error' });
+            return;
+        }
+        
         await login(username, password).then((response) => {
             console.log(response)
             if(response == "authenticated") {

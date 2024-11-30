@@ -5,6 +5,7 @@ import { theme } from '../theming/theme'
 //Import components
 import Header from '../components/HomeComponents/HomeHeader'
 import AccessCard from '../components/HomeComponents/AccessCard'
+import AccessLogs from '../components/HomeComponents/AccessLogs'
 
 export default function Home() {
     return (
@@ -18,6 +19,7 @@ export default function Home() {
             }}>
                 <Header />
                 <AccessCard />
+                <AccessLogs />
             </Surface>
         </View>
     )
