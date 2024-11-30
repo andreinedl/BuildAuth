@@ -29,7 +29,9 @@ app.use('/logs', logRouter)
 
 //handle 404
 app.use((req : Request, res : Response, next: NextFunction) => {
-    res.status(404).send('Not found')
+    res.status(404).json({
+      message: "Not found"
+    })
 })
 
 //log requests

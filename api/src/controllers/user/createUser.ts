@@ -8,15 +8,16 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             req.body
         )
         const username = req.body.username
+        const email = req.body.email
         const password = req.body.password
         const firstName = req.body.firstName
         const lastName = req.body.lastName
         const allowed = req.body.allowed
         const admin = req.body.admin
 
-        if (!username || !password || !firstName || !lastName || !allowed || !admin) {
+        if (!username || !password || !firstName || !lastName || !allowed || !admin || !email) {
             res.status(400).json({
-                message: 'Missing required fields, required fields are: username, password, firstName, lastName, allowed, admin'
+                message: 'Missing required fields, required fields are: username, email, password, firstName, lastName, allowed, admin'
             })
             return;
         }
@@ -26,6 +27,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         // create user in DB
         const user = User.build({
             username,
+            email,
             password: `${hashedPassword}`,
             firstName,
             lastName,
