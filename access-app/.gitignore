@@ -35,7 +35,7 @@ yarn-error.*
 *.tsbuildinfo
 
 # build dirs
-android/build
+android
 ios
 
 yarn.lock
