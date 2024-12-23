@@ -36,7 +36,7 @@ const fonts = configureFonts({
   },
 });
 
-export const theme = {
+const theme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
@@ -54,3 +54,5 @@ export const theme = {
   fonts: fonts,
   roundness: 12
 }
+
+export default theme

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity } from "react-native";
 import { TextInput, Icon } from 'react-native-paper';
-import { i18n } from "../../localization/locale";
+import i18n from "../../localization/locale";
 
 export default function LoginInputs({username, password, setUsername, setPassword}) {
     const [passwordHidden, setPasswordHidden] = useState(true)

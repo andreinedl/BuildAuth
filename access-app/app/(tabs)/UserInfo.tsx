@@ -1,10 +1,10 @@
-import { Text } from "../components/Text"
+import Text from "../components/Text"
 import { View } from 'react-native'
 import { Button, Icon, Surface, List } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext"
 import { useContext, useEffect, useState } from "react";
-import { theme } from "../theming/theme";
-import { i18n } from "../localization/locale";
+import theme from  "../theming/theme";
+import i18n from "../localization/locale";
 
 export default function UserInfo() {
     const { user, logout } = useAuth();

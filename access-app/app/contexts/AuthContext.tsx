@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { createContext, useContext } from "react";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { ActivityIndicator } from 'react-native-paper';
-import { config } from '../config';
+import config from '../config';
 
 interface AuthType {
     login: (username: string, password: string) => Promise<String>;
@@ -26,11 +26,11 @@ interface AuthType {
 
 const AuthContext = createContext<AuthType>(undefined);
 
-export const useAuth = () => {
+const useAuth = () => {
 	return useContext(AuthContext);
 };
 
-export const AuthProvider = ({ children }: any) => {
+const AuthProvider = ({ children }: any) => {
     const userInfo = {
         username: '',
         email: '',
@@ -113,3 +113,6 @@ export const AuthProvider = ({ children }: any) => {
         </AuthContext.Provider>
     )
 }
+
+export default AuthProvider;
+export { useAuth };

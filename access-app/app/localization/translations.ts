@@ -1,4 +1,4 @@
-export const translations = {
+const translations = {
     en: {
         LoginGreetingH1: 'Hello 👋',
         LoginGreetingH2: 'Please sign in:',
@@ -13,6 +13,7 @@ export const translations = {
         BluetoothDisabledText: 'Bluetooth is disabled',
         BluetoothEnabledText: 'You can hold your phone near the reader.',
         BluetoothNotSupportedText: 'Bluetooth is not supported on this device',
+        BluetoothNoPermissionsText: 'You have not granted permissions for Bluetooth',
         HomeTab: 'Home',
         UserInfoTab: 'User Info',
         firstName: 'First Name',
@@ -40,6 +41,7 @@ export const translations = {
         BluetoothDisabledText: 'Bluetooth este dezactivat',
         BluetoothEnabledText: 'Poti tine telefonul apropiat de cititor.',
         BluetoothNotSupportedText: 'Bluetooth nu este suportat pe acest dispozitiv',
+        BluetoothNoPermissionsText: 'Nu ai acordat permisiuni pentru Bluetooth',
         HomeTab: 'Acasă',
         UserInfoTab: 'Informații utilizator',
         firstName: 'Prenume',
@@ -54,3 +56,5 @@ export const translations = {
         EmptyFields: "Câmpurile nu pot fi goale"
     }
 }
+
+export default translations

@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { BottomNavigation } from 'react-native-paper';
 import Home from "./Home"
 import UserInfo from "./UserInfo"
-import { theme } from '../theming/theme';
-import { i18n } from '../localization/locale';
+import theme from  '../theming/theme';
+import i18n from '../localization/locale';
 import { Slot } from 'expo-router';
 
 const HomeRoute = () => <Home />

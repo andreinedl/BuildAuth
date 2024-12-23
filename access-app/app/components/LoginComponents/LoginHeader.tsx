@@ -1,6 +1,6 @@
-import { Text } from "../Text"
+import Text from "../Text"
 import { View } from "react-native"
-import { i18n } from "../../localization/locale";
+import i18n from "../../localization/locale";
 
 export default function LoginHeader() {
     return (

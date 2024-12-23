@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigationBar.tsx b/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigationBar.tsx
+index 0bfe303..df2ae07 100644
+--- a/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigationBar.tsx
++++ b/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigationBar.tsx
+@@ -360,7 +360,7 @@ const BottomNavigationBar = <Route extends BaseRoute>({
+   navigationState,
+   renderIcon,
+   renderLabel,
+-  renderTouchable = (props: TouchableProps<Route>) => <Touchable {...props} />,
++  renderTouchable = ({ key, ...props }: TouchableProps<Route>) => <Touchable key={key} {...props} />, //https://github.com/callstack/react-native-paper/issues/4401#issuecomment-2133019168
+   getLabelText = ({ route }: { route: Route }) => route.title,
+   getBadge = ({ route }: { route: Route }) => route.badge,
+   getColor = ({ route }: { route: Route }) => route.color,

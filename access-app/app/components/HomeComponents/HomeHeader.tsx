@@ -1,6 +1,6 @@
 import { View } from 'react-native'
-import { Text } from "../../components/Text"
-import { i18n } from '../../localization/locale'
+import Text from "../../components/Text"
+import i18n from '../../localization/locale'
 import { useContext } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 

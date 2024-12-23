@@ -7,10 +7,10 @@ const LockStatusCharacteristicUUID: string = '3d46c16c-17ac-45c7-8638-0e75b4fed4
 
 interface Bluetooth {
   requestBluetoothPermissions: () => Promise<Boolean>;
-  connectToDevice: () => Promise<void>;
   lockStatus: Boolean;
   isConnected: Boolean;
   BtManager: BleManager;
+  enableBluetooth: () => Promise<void>;
 }
 
 function useBluetooth(): Bluetooth {
@@ -42,16 +42,16 @@ function useBluetooth(): Bluetooth {
     return false;
   };
 
-  const connectToDevice = async () => {
-    // Implement your device connection logic here
+  const enableBluetooth = async () => {
+    await BtManager.enable();
   };
 
   return {
     requestBluetoothPermissions,
-    connectToDevice,
     lockStatus,
     isConnected,
     BtManager,
+    enableBluetooth
   };
 }
 

@@ -1,13 +1,12 @@
 import { View } from 'react-native'
 import { Surface, Icon } from 'react-native-paper'
-import { theme } from '../theming/theme'
+import theme from  '../theming/theme'
 
 //Import components
 import Header from '../components/HomeComponents/HomeHeader'
 import AccessCard from '../components/HomeComponents/AccessCard'
 import AccessLogs from '../components/HomeComponents/AccessLogs'
 import { useEffect } from 'react'
-import { requestBluetoothPermission } from '../permissions/permissions'
 import Bluetooth from '../bluetooth/bluetooth'
 
 export default function Home() {

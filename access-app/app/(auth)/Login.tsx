@@ -2,8 +2,8 @@
 import { View, KeyboardAvoidingView, Keyboard } from "react-native";
 import { useContext, useState } from "react";
 import { Surface } from 'react-native-paper';
-import { theme } from "../theming/theme";
-import { i18n } from "../localization/locale";
+import theme from  "../theming/theme";
+import i18n from "../localization/locale";
 import { useToast } from 'react-native-paper-toast';
 import LoginHeader from "../components/LoginComponents/LoginHeader";
 import LoginInputs from "../components/LoginComponents/LoginInputs";
