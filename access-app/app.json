@@ -4,6 +4,7 @@
     "slug": "access-app",
     "scheme": "com.andreinedelcu.access-app",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -21,13 +22,27 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_ADVERTISE",
+        "android.permission.BLUETOOTH",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
       "package": "com.andrein.accessapp"
     },
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-localization",
-      "react-native-nfc-manager",
+      ["react-native-ble-plx",
+        {
+          "isBackgroundEnabled": true,
+          "neverForLocation": true,
+          "modes": ["peripheral", "central"],
+          "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices"
+        }
+      ],
       ["expo-build-properties",
         {
           "android": {

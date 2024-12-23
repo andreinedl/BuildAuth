@@ -6,8 +6,15 @@ import { theme } from '../theming/theme'
 import Header from '../components/HomeComponents/HomeHeader'
 import AccessCard from '../components/HomeComponents/AccessCard'
 import AccessLogs from '../components/HomeComponents/AccessLogs'
+import { useEffect } from 'react'
+import { requestBluetoothPermission } from '../permissions/permissions'
+import { connectToDevice } from '../bluetooth/bluetooth'
 
 export default function Home() {
+    useEffect(() => {
+        connectToDevice()
+    })
+
     return (
         <View style={{ backgroundColor: theme.colors.background, height: "100%", width: "100%", flex: 1, justifyContent: "center" }}>
             <Surface elevation={4} style={{

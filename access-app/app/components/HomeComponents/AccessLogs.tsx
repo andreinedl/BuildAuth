@@ -6,9 +6,6 @@ import { i18n } from "../../localization/locale";
 import { theme } from "../../theming/theme";
 export default function AccessLogs () {
     const { logs } = useAuth();
-    logs.forEach((log) => {
-        console.log(log)
-    })
 
     return (
         <View style={{ justifyContent: "center" , alignContent: "center", alignItems: "center", marginTop: 40}}>
