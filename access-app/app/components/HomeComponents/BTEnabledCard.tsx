@@ -16,7 +16,7 @@ export default function BTEnabledCard() {
     
     if(isConnected) {
         return <BTConnectedCard />
-    } else if (isConnected === false && lostConnection === true) {
+    } else if (!isConnected && lostConnection) {
         return <BTLostConnection />
     } else {
         return <BTScanningCard />

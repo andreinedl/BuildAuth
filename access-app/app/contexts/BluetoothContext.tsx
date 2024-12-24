@@ -32,9 +32,7 @@ const BluetoothProvider = ({ children }: any) => {
     const [lockStatus, setLockStatus] = useState<Boolean>(false);
     const [deviceRSSI, setDeviceRSSI] = useState<number>(0);
     const [lostConnection, setLostConnection] = useState<Boolean>(false);
-    const scanTimeoutRef = useRef(null)
-    const isScanningRef = useRef(false);
-
+    
     //monitor rssi task
     const intervalIdRef = useRef(null);
 
@@ -66,17 +64,18 @@ const BluetoothProvider = ({ children }: any) => {
         return false;
       };
 
-    /*const connectToDevice = () => {
+    const connectToDevice = () => {
         BtManager.stopDeviceScan(); // Ensure any previous scan is stopped
+        setLostConnection(false);
+        console.log("Scanning for devices");
         BtManager.startDeviceScan(null, null, async (error, device) => {
-            console.log("Scanning for devices");
             if (error) {
                 console.log('Error', error);
                 return;
             }
     
             if (device.name === 'BuildAuth') {
-                BtManager.stopDeviceScan();    
+                BtManager.stopDeviceScan();
                 device.connect()
                 .then((device) => device.discoverAllServicesAndCharacteristics()
                 .then((device) => {
@@ -91,47 +90,7 @@ const BluetoothProvider = ({ children }: any) => {
                 )
             }
         })
-    }*/
-        const connectToDevice = async () => {
-            if (isScanningRef.current) {
-              console.log('Already scanning for devices');
-              return;
-            }
-        
-            isScanningRef.current = true;
-            BtManager.stopDeviceScan(); // Ensure any previous scan is stopped
-            BtManager.startDeviceScan(null, null, async (error, device) => {
-              if (error) {
-                console.log('Error', error);
-                isScanningRef.current = false;
-                return;
-              }
-        
-              if (device && device.name === 'BuildAuth') {
-                BtManager.stopDeviceScan();
-                isScanningRef.current = false;
-                try {
-                  const connectedDevice = await device.connect();
-                  console.log('Connected to device', connectedDevice.id); // connectedDevice.id is the device ID
-                  await connectedDevice.discoverAllServicesAndCharacteristics();
-                  setIsConnected(true);
-                  setLostConnection(false);
-                  monitorRSSI(connectedDevice);
-                  monitorLockStatus(connectedDevice);
-                } catch (error) {
-                  console.log('Connection error', error);
-                  setIsConnected(false);
-                  setLostConnection(true);
-                }
-              }
-            });
-        
-            // Stop scanning after 10 seconds
-            scanTimeoutRef.current = setTimeout(() => {
-              BtManager.stopDeviceScan();
-              isScanningRef.current = false;
-            }, 10000);
-          };
+    }
 
     const monitorLockStatus = (device: Device) => {
         if (device) {
@@ -144,7 +103,7 @@ const BluetoothProvider = ({ children }: any) => {
         }
     };
     
-      //inspired from https://github.com/friyiajr/BLESampleExpo/blob/main/useBLE.ts
+    //inspired from https://github.com/friyiajr/BLESampleExpo/blob/main/useBLE.ts
     
     const onChangeLockStatus = (error, characteristic) : void => {
         if (error) {
@@ -171,7 +130,6 @@ const BluetoothProvider = ({ children }: any) => {
               })
               .catch((error) => {
                 console.log('Error', error);
-              //  stopMonitoringRSSI();
                 disconnect(device);
               });
           }, 2000);
@@ -222,7 +180,7 @@ const BluetoothProvider = ({ children }: any) => {
         lostConnection,
         bluetoothState,
         lockStatus,
-        deviceRSSI
+        deviceRSSI,
 	};
 
     return (
