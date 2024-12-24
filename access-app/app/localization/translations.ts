@@ -14,6 +14,7 @@ const translations = {
         BluetoothEnabledText: 'You can hold your phone near the reader.',
         BluetoothNotSupportedText: 'Bluetooth is not supported on this device',
         BluetoothNoPermissionsText: 'You have not granted permissions for Bluetooth',
+        BluetoothScanningText: "Looking for the BuildAuth device",
         HomeTab: 'Home',
         UserInfoTab: 'User Info',
         firstName: 'First Name',
@@ -25,7 +26,11 @@ const translations = {
         LoginSuccess: 'Login successful',
         LoginFailed: 'Invalid credentials',
         UnknownError: 'Unknown error',
-        EmptyFields: "The fields can not be empty"
+        EmptyFields: "The fields can not be empty",
+        SecuredText: "The building is secured",
+        NotSecuredText: "The building is not secured",
+        BluetoothLostConnectionText: "Lost connection to the BuildAuth device",
+        LowSignalText: "Weak signal. Approach the device",
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -42,6 +47,7 @@ const translations = {
         BluetoothEnabledText: 'Poti tine telefonul apropiat de cititor.',
         BluetoothNotSupportedText: 'Bluetooth nu este suportat pe acest dispozitiv',
         BluetoothNoPermissionsText: 'Nu ai acordat permisiuni pentru Bluetooth',
+        BluetoothScanningText: "Se caută dispozitivul BuildAuth",
         HomeTab: 'Acasă',
         UserInfoTab: 'Informații utilizator',
         firstName: 'Prenume',
@@ -53,7 +59,11 @@ const translations = {
         LoginSuccess: 'Te-ai autentificat cu succes',
         LoginFailed: 'Date de conectare invalide',
         UnknownError: 'Eroare necunoscută',
-        EmptyFields: "Câmpurile nu pot fi goale"
+        EmptyFields: "Câmpurile nu pot fi goale",
+        SecuredText: "Cladirea este securizată",
+        NotSecuredText: "Cladirea nu este securizată",
+        BluetoothLostConnectionText: "Conexiune pierdută cu dispozitivul BuildAuth",
+        LowSignalText: "Semnal slab. Apropie-te de dispozitiv",
     }
 }
 

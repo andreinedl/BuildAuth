@@ -1,15 +1,24 @@
-import { View } from "react-native"
-import { Surface, Icon } from "react-native-paper"
-import Text from "../Text"
-import i18n from "../../localization/locale"
+import React from "react"
+import { View } from "react-native";
+import { useEffect, useState } from "react";
+import { Surface, ActivityIndicator } from "react-native-paper";
+import Text from "../Text";
+
+import BTScanningCard from "./BTEnabledCards/BTScanningCard"
+import BTConnectedCard from "./BTEnabledCards/BTConnectedCard";
+import BTLostConnection from "./BTEnabledCards/BTLostConnection";
+
+//Bluetooth
+import { useBluetooth } from "../../contexts/BluetoothContext";
 
 export default function BTEnabledCard() {
-    return (
-        <View style={{marginTop: 45, width: "100%", height: "25%", justifyContent: "center", alignItems: "center"}}>
-            <Surface elevation={5} style={{width: "82%", height: "100%", borderRadius: 15, justifyContent: "center", alignItems: "center", gap: 15, flexShrink: 1 }}>
-                <Icon source="contactless-payment-circle-outline" size={55}/>
-                <Text variant='titleMedium' textVariant='regular'>{i18n.t("BluetoothEnabledText")}</Text>
-            </Surface>
-        </View>
-    )
+    const { isConnected, lostConnection } = useBluetooth();
+    
+    if(isConnected) {
+        return <BTConnectedCard />
+    } else if (isConnected === false && lostConnection === true) {
+        return <BTLostConnection />
+    } else {
+        return <BTScanningCard />
+    }
 }

@@ -9,6 +9,7 @@ import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastProvider } from 'react-native-paper-toast';
 import * as NavigationBar from 'expo-navigation-bar';
 import AuthProvider from './contexts/AuthContext';
+import BluetoothProvider from './contexts/BluetoothContext';
 
 //import stack screens
 import Stack from './Stack';
@@ -49,7 +50,9 @@ export default function RootLayout() {
         <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
           <ToastProvider>
             <AuthProvider>
-              <Stack />
+              <BluetoothProvider>
+                <Stack />
+              </BluetoothProvider>
             </AuthProvider>
           </ToastProvider>
         </SafeAreaView>

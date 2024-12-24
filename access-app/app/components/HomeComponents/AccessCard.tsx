@@ -12,12 +12,13 @@ import BTEnabledCard from './BTEnabledCard'
 import BTDisabledCard from './BTDisabledCard'
 import BTNotSupportedCard from './BTNotSupportedCard'
 import theme from  '../../theming/theme'
-import useBluetooth from '../../bluetooth/bluetooth';
 import LoadingCard from './LoadingCard'
 
-export default function AccessCard() {
-    const { BtManager } = useBluetooth()
+//Bluetooth
+import { BtManager } from '../../contexts/BluetoothContext';
+import { useBluetooth } from '../../contexts/BluetoothContext';
 
+export default function AccessCard() {
     const [bluetoothEnabled, setBluetoothEnabled] = useState<Boolean>()
     const [bluetoothSupported, setBluetoothSupported] = useState<Boolean>()
     const [bluetoothPermissions, setBluetoothPermissions] = useState<Boolean>()

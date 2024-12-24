@@ -2,8 +2,10 @@ import { View } from "react-native"
 import { Surface, Icon, Button } from "react-native-paper"
 import Text from "../Text"
 import i18n from "../../localization/locale"
-import useBluetooth from "../../bluetooth/bluetooth"
 import theme from  "../../theming/theme"
+
+//blueooth
+import { useBluetooth } from '../../contexts/BluetoothContext'
 
 export default function BTDisabledCard() {
     const { enableBluetooth } = useBluetooth()

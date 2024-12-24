@@ -2,8 +2,9 @@ import { View } from "react-native"
 import { Surface, Icon, Button } from "react-native-paper"
 import Text from "../Text"
 import i18n from "../../localization/locale"
-import useBluetooth from "../../bluetooth/bluetooth"
 
+//blueooth
+import { useBluetooth } from "../../contexts/BluetoothContext"
 export default function BTNoPermissionsCard() {
     const { requestBluetoothPermissions } = useBluetooth()
 
