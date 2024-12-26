@@ -11,6 +11,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+//Include the icons
+#include "lockIcon.cpp"
+#include "unlockIcon.cpp"
+
 #define SCREEN_WIDTH 128 // pixels
 #define SCREEN_HEIGHT 64 // pixels
 #define DEVICE_NAME "BuildAuth"
@@ -19,8 +23,9 @@
 #define COMMUNICATION_CHARACTERISTIC_UUID "e8fa2592-5b6a-4bfa-8a86-f8dccb89f488" //generated using https://www.uuidgenerator.net/
 #define LED_PIN 5
 
-//timer for the code generation
-SimpleTimer codeGenTimer;
+//code generation timers
+unsigned long codeGenMillis = 0;
+int codeDuration = 0;
 
 //BT
 BLEServer *pServer;
@@ -32,10 +37,35 @@ boolean oldDeviceConnected = false;
 //connect code
 int connectCode;
 
+volatile boolean codeCountdown = false;
+
 //define the screen object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 boolean lockStatus;
+
+void setLockStatus(boolean status) {
+  lockStatus = status;
+  BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
+  BuildAuthStatusCharacteristic->notify();
+
+  codeCountdown = false;
+  connectCode = 0;
+  //Update the display data with the current status
+  display.clearDisplay();
+  String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
+  display.setCursor(18,0);
+  display.println(lockStatusText);
+
+  //draw the lock/unlock icon
+  if(lockStatus == true) {
+    display.drawBitmap(48, 15, lockIcon, 32, 32, WHITE);
+  } else {
+    display.drawBitmap(48, 15, unlockIcon, 32, 32, WHITE);
+  }
+
+  display.display();
+}
 
 void generateConnectCode() {
   String connectCodeStr = "";
@@ -45,31 +75,39 @@ void generateConnectCode() {
   connectCode = connectCodeStr.toInt();
   Serial.println(connectCode);
 
-  for(int i = 5; i > 0; i--)
-  {
-    delay(1000);
-    String text = "Expires in " + String(i) + " seconds";
-    display.clearDisplay();
-    display.display();
-    //display the current lock status
-    String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
-    display.setCursor(18,0);
-    display.println(lockStatusText);
-    //display the code countdown until it expires
-    display.setCursor(5,45);
-    display.println(text);
-
-    //display the connect code
-    display.setCursor(40,25);
-    display.println(connectCode);
-    display.display();
-  }
+  codeCountdown = true;
+  codeDuration = 30; //seconds
+  codeGenMillis = millis();
 }
 
-void setLockStatus(boolean status) {
-  lockStatus = status;
-  BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
-  BuildAuthStatusCharacteristic->notify();
+void updateCountdown() {
+  if (codeCountdown) {
+    unsigned long currentMillis = millis();    
+    if (currentMillis - codeGenMillis >= 1000) {
+      codeGenMillis = currentMillis;
+      codeDuration--;
+      
+      if (codeDuration <= 0) {
+        setLockStatus(lockStatus);
+      } else {
+        display.clearDisplay();
+        display.display();
+        //display the current lock status
+        String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
+        display.setCursor(18,0);
+        display.println(lockStatusText);
+        //display the code countdown until it expires               
+        String text = "Expires in " + String(codeDuration) + " seconds";
+        display.setCursor(0,45);
+        display.println(text);
+    
+        //display the connect code
+        display.setCursor(40,25);
+        display.println(connectCode);
+        display.display();
+      }
+    }
+  }
 }
 
 class ServerCallbacks: public BLEServerCallbacks {
@@ -90,11 +128,11 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
     Serial.print(value);
     Serial.print("\n");
 
-    if(value.length() > 0) {
-      if (value == "true") {
-        setLockStatus(true);
-      } else if (value == "false") {
-        setLockStatus(false);
+    if(value.length() > 0) {  
+      if(value == "requestCode") {
+        generateConnectCode();
+      } else if(value == String(connectCode)) {
+        setLockStatus(!lockStatus);
       }
     }
   }
@@ -118,9 +156,6 @@ void setup() {
   display.display();
 
   pinMode(LED_PIN, OUTPUT);
-
-  //Set the timer for the code generation
-  codeGenTimer.setInterval(5000, generateConnectCode);
 
   // Init BT
   BLEDevice::init(DEVICE_NAME);
@@ -170,14 +205,12 @@ void setup() {
   BLEDevice::startAdvertising();
   Serial.println("Waiting for a client connection to notify...");
 
-  //set the default value for the lock status on startup
+  //set the default value for lockstatus
   setLockStatus(true);
 }
 
 void loop() {
-  //start the code gen timer
-  codeGenTimer.run();
-
+  updateCountdown();
   // Handle device connection status
   if (deviceConnected && !oldDeviceConnected) {
     // Do stuff here on connecting
