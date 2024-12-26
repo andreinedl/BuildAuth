@@ -90,8 +90,9 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
     if (value.length() > 0) {
       Serial.print("Received value: ");
       for (int i = 0; i < value.length(); i++) {
-        Serial.print(value[i] + "\n");
+        Serial.print(value[i]);
       }
+      Serial.println();
     }
   }
 };
@@ -133,8 +134,7 @@ void setup() {
   BuildAuthStatusCharacteristic = BuildAuthService->createCharacteristic(
                                          STATUS_CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_NOTIFY |
-                                         BLECharacteristic::PROPERTY_WRITE
+                                         BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
   BuildAuthCommunicationCharacteristic = BuildAuthService->createCharacteristic(
