@@ -22,9 +22,6 @@
 //timer for the code generation
 SimpleTimer codeGenTimer;
 
-//timer for random boolean
-SimpleTimer randomBoolTimer;
-
 //BT
 BLEServer *pServer;
 BLECharacteristic *BuildAuthStatusCharacteristic;
@@ -38,10 +35,12 @@ int connectCode;
 //define the screen object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
+boolean lockStatus;
+
 void generateConnectCode() {
   String connectCodeStr = "";
   for (int i = 0; i < 6; i++) {
-    connectCodeStr += String(random(10));
+    connectCodeStr += String(random(1,9));
   }
   connectCode = connectCodeStr.toInt();
   Serial.println(connectCode);
@@ -52,24 +51,25 @@ void generateConnectCode() {
     String text = "Expires in " + String(i) + " seconds";
     display.clearDisplay();
     display.display();
-    display.setCursor(0,28);
+    //display the current lock status
+    String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
+    display.setCursor(18,0);
+    display.println(lockStatusText);
+    //display the code countdown until it expires
+    display.setCursor(5,45);
     display.println(text);
-    display.setCursor(40,0);
+
+    //display the connect code
+    display.setCursor(40,25);
     display.println(connectCode);
     display.display();
   }
 }
 
-void generateRandomBool() {
-  //generate random boolean
-  boolean randomBool = random(0, 2); // Generate a random boolean value (0 or 1)
-
-  // Send the boolean value over BLE
-  BuildAuthStatusCharacteristic->setValue(randomBool ? "true" : "false");
+void setLockStatus(boolean status) {
+  lockStatus = status;
+  BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
   BuildAuthStatusCharacteristic->notify();
-
-  Serial.print("Sent value: ");
-  Serial.println(randomBool ? "true" : "false");
 }
 
 class ServerCallbacks: public BLEServerCallbacks {
@@ -85,14 +85,17 @@ class ServerCallbacks: public BLEServerCallbacks {
 
 class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) override {
-    std::string value = pCharacteristic->getValue();
+    String value = pCharacteristic->getValue().c_str();
+    Serial.print("Raw value: ");
+    Serial.print(value);
+    Serial.print("\n");
 
-    if (value.length() > 0) {
-      Serial.print("Received value: ");
-      for (int i = 0; i < value.length(); i++) {
-        Serial.print(value[i]);
+    if(value.length() > 0) {
+      if (value == "true") {
+        setLockStatus(true);
+      } else if (value == "false") {
+        setLockStatus(false);
       }
-      Serial.println();
     }
   }
 };
@@ -118,9 +121,6 @@ void setup() {
 
   //Set the timer for the code generation
   codeGenTimer.setInterval(5000, generateConnectCode);
-
-  //Set the timer for the random boolean
-  randomBoolTimer.setInterval(7000, generateRandomBool);
 
   // Init BT
   BLEDevice::init(DEVICE_NAME);
@@ -169,14 +169,14 @@ void setup() {
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
   Serial.println("Waiting for a client connection to notify...");
+
+  //set the default value for the lock status on startup
+  setLockStatus(true);
 }
 
 void loop() {
   //start the code gen timer
   codeGenTimer.run();
-
-  // Simulate changing the boolean value
-  randomBoolTimer.run();
 
   // Handle device connection status
   if (deviceConnected && !oldDeviceConnected) {
