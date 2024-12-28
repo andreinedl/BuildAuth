@@ -12,10 +12,10 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         const password = req.body.password
         const firstName = req.body.firstName
         const lastName = req.body.lastName
-        const allowed = req.body.allowed
-        const admin = req.body.admin
+        let allowed = req.body.allowed
+        let admin = req.body.admin
 
-        if (!username || !password || !firstName || !lastName || !allowed || !admin || !email) {
+        if (!username || !password || !firstName || !lastName || !email) {
             res.status(400).json({
                 message: 'Missing required fields, required fields are: username, email, password, firstName, lastName, allowed, admin'
             })
@@ -23,6 +23,17 @@ export async function createUser(req: Request, res: Response, next: NextFunction
         }
 
         const hashedPassword = await hashSync(password, 10) // 10 = salt number // https://escape.tech/blog/how-to-secure-express-js-api/
+        if(admin === undefined || admin === false) {
+            admin = false
+        } else {
+            admin = true
+        }
+
+        if(allowed === undefined || allowed === false) {
+            allowed = false
+        } else {
+            allowed = true
+        }
        
         // create user in DB
         const user = User.build({

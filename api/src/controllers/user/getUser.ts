@@ -7,6 +7,7 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
         const users = await User.findAll()
         const usersInfo = users.map((user) => {
             return {
+                username: user.getDataValue('username'),
                 email: user.getDataValue('email'),
                 firstName: user.getDataValue('firstName'),
                 lastName: user.getDataValue('lastName'),
@@ -28,6 +29,7 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
     } else {
         await User.findOne({where: { username: username }}).then((user) => {
             res.json({
+                username: user?.getDataValue('username'),
                 email: user?.getDataValue('email'),
                 firstName: user?.getDataValue('firstName'),
                 lastName: user?.getDataValue('lastName'),

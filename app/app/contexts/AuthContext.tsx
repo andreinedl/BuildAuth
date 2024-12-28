@@ -1,22 +1,23 @@
 import axios from 'axios';
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { ActivityIndicator } from 'react-native-paper';
 import config from '../config';
 
+export interface User {
+    username: string;
+    email: string;
+    lastAccess: string;
+    allowed: boolean;
+    firstName: string;
+    lastName: string;
+    admin: boolean;
+}
 interface AuthType {
     login: (username: string, password: string) => Promise<String>;
     logout: () => void;
     getUsersList: () => Promise<void>
-    user: {
-        username: string;
-        email: string;
-        lastAccess: string;
-        allowed: string;
-        firstName: string;
-        lastName: string;
-        admin: boolean;
-    };
+    user: User;
     isLoading: boolean;
     isAuthenticated: boolean;
     logs: Array<{
@@ -28,11 +29,17 @@ interface AuthType {
         username: string,
         email: string,
         lastAccess: string,
-        allowed: string,
+        allowed: boolean,
         firstName: string,
         lastName: string,
         admin: boolean,
-    }>; 
+    }>;
+
+    //edit dialog props
+    editDialogVisibility: boolean,
+    setEditDialogVisibility: (value: boolean) => void,
+    editUser: User,
+    showEditDialog: (user: User) => void
 }
 
 const AuthContext = createContext<AuthType>(undefined);
@@ -42,14 +49,14 @@ const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: any) => {
-    const userInfo = {
+    const userInfo: User = {
         username: '',
         email: '',
         lastAccess: '',
-        allowed: '',
+        allowed: false,  // Changed from null to false
         firstName: '',
         lastName: '',
-        admin: null,
+        admin: false,    // Changed from null to false
     }
 
     let log = {
@@ -58,12 +65,16 @@ const AuthProvider = ({ children }: any) => {
         message: '',
     }
 
-    const [user, setUser] = React.useState(userInfo);
+    const [user, setUser] = React.useState<User>(userInfo);
     const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState('');
     const [logs, setLogs] = React.useState(Array<typeof log>);
-    const [usersList, setUsersList] = React.useState(Array<typeof user>)
+    const [usersList, setUsersList] = React.useState<User[]>([])
+
+    //edit dialog props
+    const [editDialogVisibility, setEditDialogVisibility] = React.useState<boolean>(false);
+    const [editUser, setEditUser] = React.useState<User>(userInfo);
 
     const login = async (username: string, password: string): Promise<String> => {
         try {
@@ -112,18 +123,22 @@ const AuthProvider = ({ children }: any) => {
 
     const getUsersList = async() => {
         const response = await axios.get(`${config.apiUrl}/users/`, { timeout: 5000 })
-        let usersListData = response.data.map(userInfo => {
-            return {
-                username: userInfo.username,
-                email: userInfo.email,
-                lastAccess: userInfo.lastAccess,
-                allowed: userInfo.allowed,
-                firstName: userInfo.firstName,
-                lastName: userInfo.lastName,
-                admin: userInfo.admin,
-            }
-        })
+        const usersListData: User[] = response.data.map((userInfo: User) => ({
+            username: userInfo.username,
+            email: userInfo.email,
+            lastAccess: userInfo.lastAccess,
+            allowed: userInfo.allowed,
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            admin: userInfo.admin,
+        }))
         setUsersList(usersListData);
+    }
+
+    const showEditDialog = (user: User) => {
+        if (!user) return;
+        setEditUser(user);
+        setEditDialogVisibility(true);
     }
 
     const value = {
@@ -135,7 +150,11 @@ const AuthProvider = ({ children }: any) => {
         isLoading, 
         loginMessage,
         logs,
-        usersList
+        usersList,
+        editDialogVisibility,
+        setEditDialogVisibility,
+        editUser,
+        showEditDialog
 	};
 
     return (

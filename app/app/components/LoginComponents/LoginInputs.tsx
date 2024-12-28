@@ -29,7 +29,7 @@ export default function LoginInputs({username, password, setUsername, setPasswor
         }}>
             {/*Username input*/}
             <TextInput
-                label={i18n.t('LoginUsernamePlaceholder')} 
+                label={i18n.t('UsernamePlaceholder')} 
                 mode="outlined" 
                 style={{ 
                     width: "95%", 
@@ -37,10 +37,11 @@ export default function LoginInputs({username, password, setUsername, setPasswor
                 }}
                 value={username}
                 onChangeText={username => setUsername(username)}
+                theme={{ roundness: 12 }}
             />
             {/*Password input*/}
             <TextInput 
-                label={i18n.t("LoginPasswordPlaceholder")}
+                label={i18n.t("PasswordPlaceholder")}
                 secureTextEntry={passwordHidden}
                 right={<TextInput.Icon icon={passwordHidden ? "eye-outline" : "eye-off-outline"} onPress={togglePasswordVisibility}/>}
                 mode="outlined"
@@ -50,6 +51,7 @@ export default function LoginInputs({username, password, setUsername, setPasswor
                 }}
                 value={password}
                 onChangeText={password => setPassword(password)}
+                theme={{ roundness: 12 }}
             />
         </View>
     )

@@ -36,6 +36,24 @@ const fonts = configureFonts({
   },
 });
 
+/*const theme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    // Modern dark theme with red accents - generated with ChatGPT
+    primary: '#E53935',     // Vibrant red
+    onPrimary: '#FFFFFF',   // White text on primary
+    secondary: '#FF8A65',   // Coral/orange accent
+    onSecondary: '#000000', // Black text on secondary
+    background: '#1C1616',  // Dark reddish-black
+    onSurface: '#F5F5F5',  // Off-white for text
+    error: '#FFD700',      // Gold for errors (avoiding another red)
+    onError: '#000000',    // Black text on error
+    outline: '#382E2E',    // Subtle reddish border
+  },
+  fonts: fonts,
+  roundness: 2
+}*/
 const theme = {
   ...MD3DarkTheme,
   colors: {
@@ -52,7 +70,7 @@ const theme = {
     outline: '#373737',   
   },
   fonts: fonts,
-  roundness: 12
+  roundness: 2
 }
 
 export default theme

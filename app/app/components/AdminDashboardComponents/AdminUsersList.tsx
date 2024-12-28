@@ -2,9 +2,11 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { List, Surface, Divider, Avatar, Text, Button } from "react-native-paper";
 import { useAuth } from "../../contexts/AuthContext";
 import theme from "../../theming/theme";
+import { useState } from "react";
+import EditUserDialog from "../Dialogs/EditUserDialog";
 
 export default function AdminUsersList() {
-    const { usersList } = useAuth();
+    const { usersList, showEditDialog } = useAuth();
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
@@ -82,7 +84,7 @@ export default function AdminUsersList() {
                             <View style={{ marginRight: 40, marginTop: 10, marginBottom: 10}}>
                                 <Button 
                                     mode="contained"
-                                    onPress={() => console.log("it works")}
+                                    onPress={() => showEditDialog(user)}
                                     icon="pencil"
                                 >
                                     Edit User
