@@ -1,0 +1,51 @@
+version: '3'
+name: "mariadb-pma"
+
+services:
+  buildauth_api:
+    container_name: api
+    build: .
+    restart: always
+    ports:
+      - "80:3000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      apinet:
+         ipv4_address: 172.69.0.2
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    restart: always
+    healthcheck:
+        test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
+        start_period: 1m
+        start_interval: 10s
+        interval: 1m
+        timeout: 5s
+        retries: 3
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+    expose:
+       - 3306
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      apinet:
+         ipv4_address: 172.69.0.3
+volumes:
+  db_data:
+  
+networks:
+  apinet:
+    name: apinet
+    driver: bridge
+#    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.69.0.0/28
+          gateway: 172.69.0.1
