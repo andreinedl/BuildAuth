@@ -36,7 +36,7 @@ const BluetoothContext = createContext<BluetoothType>(undefined);
 const BluetoothProvider = ({ children }: any) => {
     const [isConnected, setIsConnected] = useState<Boolean>(false);
     const [bluetoothState, setBluetoothState] = useState<Boolean>();
-    const [lockStatus, setLockStatus] = useState<Boolean>(false);
+    const [lockStatus, setLockStatus] = useState<Boolean>(undefined);
     const [deviceRSSI, setDeviceRSSI] = useState<number>(0);
     const [lostConnection, setLostConnection] = useState<Boolean>(false);
     const [modalVisibility, setModalVisibility] = useState<boolean>(false);
@@ -88,6 +88,14 @@ const BluetoothProvider = ({ children }: any) => {
                 device.connect()
                 .then((device) => device.discoverAllServicesAndCharacteristics()
                 .then((device) => {
+                    //read the lock status when it gets connected
+
+                    device.readCharacteristicForService(serviceUUID, LockStatusCharacteristicUUID).then((characteristic) => {
+                        const value = atob(characteristic.value)
+                        setLockStatus((value == "true") ? true : false)
+                    })
+
+                    //
                     setConnectedDevice(device);
                     setIsConnected(true);
                     monitorLockStatus(device);

@@ -1,9 +1,22 @@
-import { View } from "react-native"
+import { View } from "react-native";
+import { Surface } from "react-native-paper";
+import theme from "../theming/theme";
+import AdminHeader from "../components/AdminDashboardComponents/AdminHeader";
+import AdminUsersList from "../components/AdminDashboardComponents/AdminUsersList";
 
 export default function AdminDashboard() {
     return ( 
-        <View>
-            
+        <View style={{ backgroundColor: theme.colors.background, height: "100%", width: "100%", flex: 1, justifyContent: "center" }}>
+            <Surface elevation={4} style={{
+                backgroundColor: theme.colors.surface,
+                width: "95%",
+                height: "97%", 
+                alignSelf: 'center',
+                borderRadius: 20,
+            }}>
+                <AdminHeader />
+                <AdminUsersList />
+            </Surface>
         </View>
     )
 }

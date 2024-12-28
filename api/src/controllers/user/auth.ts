@@ -33,6 +33,7 @@ export async function auth(req: Request, res : Response, next: NextFunction) {
                     allowed: user?.getDataValue('allowed'),
                     firstName: user?.getDataValue('firstName'),
                     lastName: user?.getDataValue('lastName'),
+                    admin: user.getDataValue('admin')
                 }
             })
         } else {

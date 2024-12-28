@@ -31,8 +31,7 @@ export default function TabLayout() {
     ]);
 
     let renderScene;
-    //if the user is not an admin, do not render the admin tab
-    if(user.admin == true) {
+    if(user.admin) {
         renderScene = BottomNavigation.SceneMap({
             home: HomeRoute,
             userInfo: UserInfoRoute,
@@ -44,9 +43,7 @@ export default function TabLayout() {
             userInfo: UserInfoRoute,
         });
     }
-
-    const { setModalVisibility } = useBluetooth()
-   
+       
     return (
         <BottomNavigation
           navigationState={{ index, routes }}

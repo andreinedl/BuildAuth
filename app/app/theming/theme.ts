@@ -41,7 +41,7 @@ const theme = {
   colors: {
     ...MD3DarkTheme.colors,
     // Customize colors - colours generated with ChatGPT :D
-    primary: '#8B0000',   
+    primary: '#D32F2F',   
     onPrimary: '#FFFFFF', 
     secondary: '#FF6347', 
     onSecondary: '#000000',

@@ -6,6 +6,7 @@ import i18n from "../../../localization/locale";
 
 //Bluetooth
 import { useBluetooth } from '../../../contexts/BluetoothContext';
+import BTScanningCard from './BTScanningCard';
 
 export default function BTConnectedCard() {
     const { lockStatus, deviceRSSI, setModalVisibility, requestCode } = useBluetooth();
@@ -26,7 +27,7 @@ export default function BTConnectedCard() {
             </View>
         )
     } else {
-        return (
+        /*return (
             <>
                 <View style={styles.container}>
                     <Surface elevation={5} style={styles.surface}>
@@ -50,7 +51,36 @@ export default function BTConnectedCard() {
                     </Surface>
                 </View>
             </>
-        )
+        )*/
+        if(lockStatus == true) {
+            return (
+                <View style={styles.container}>
+                    <Surface elevation={5} style={styles.surface}>
+                        <Icon source="lock-outline" size={55} />
+                        <Text variant='titleMedium' textVariant='regular'>{i18n.t("SecuredText")}</Text>
+                        <Button mode="contained" icon="key" style={styles.button} buttonColor='green' onPress={openModal}>
+                            Unlock
+                        </Button>
+                    </Surface>
+                </View>
+            )
+        } else if(lockStatus == false) {
+            return (
+                <View style={styles.container}>
+                    <Surface elevation={5} style={styles.surface}>
+                        <Icon source="lock-open-variant-outline" size={55} />
+                        <Text variant='titleMedium' textVariant='regular'>{i18n.t("NotSecuredText")}</Text>
+                        <Button mode="contained" icon="key" style={styles.button} onPress={openModal}>
+                            Lock
+                        </Button>
+                    </Surface>
+                </View>
+            )
+        } else if(lockStatus == undefined) {
+            return (
+                <BTScanningCard />
+            )
+        }
     }
 }
 

@@ -32,6 +32,7 @@ const translations = {
         NotSecuredText: "The building is not secured",
         BluetoothLostConnectionText: "Lost connection to the BuildAuth device",
         LowSignalText: "Weak signal. Approach the device",
+        EditUserDialogTitle: "Edit User"
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -66,6 +67,7 @@ const translations = {
         NotSecuredText: "Cladirea nu este securizată",
         BluetoothLostConnectionText: "Conexiune pierdută cu dispozitivul BuildAuth",
         LowSignalText: "Semnal slab. Apropie-te de dispozitiv",
+        EditUserDialogTitle: "Editati utilizatorul"
     }
 }
 

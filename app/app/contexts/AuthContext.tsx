@@ -7,6 +7,7 @@ import config from '../config';
 interface AuthType {
     login: (username: string, password: string) => Promise<String>;
     logout: () => void;
+    getUsersList: () => Promise<void>
     user: {
         username: string;
         email: string;
@@ -23,6 +24,15 @@ interface AuthType {
         timestamp: string;
         message: string;
     }>;
+    usersList: Array<{
+        username: string,
+        email: string,
+        lastAccess: string,
+        allowed: string,
+        firstName: string,
+        lastName: string,
+        admin: boolean,
+    }>; 
 }
 
 const AuthContext = createContext<AuthType>(undefined);
@@ -53,6 +63,7 @@ const AuthProvider = ({ children }: any) => {
     const [isLoading, setLoading] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState('');
     const [logs, setLogs] = React.useState(Array<typeof log>);
+    const [usersList, setUsersList] = React.useState(Array<typeof user>)
 
     const login = async (username: string, password: string): Promise<String> => {
         try {
@@ -64,6 +75,7 @@ const AuthProvider = ({ children }: any) => {
             setUser(response.data.userInfo);
             setAuthenticated(true);
             getLogs()
+            getUsersList()
             setLoading(false);
             return "authenticated";
         } catch(error) {
@@ -98,14 +110,32 @@ const AuthProvider = ({ children }: any) => {
         setLogs(logsData);
     }
 
+    const getUsersList = async() => {
+        const response = await axios.get(`${config.apiUrl}/users/`, { timeout: 5000 })
+        let usersListData = response.data.map(userInfo => {
+            return {
+                username: userInfo.username,
+                email: userInfo.email,
+                lastAccess: userInfo.lastAccess,
+                allowed: userInfo.allowed,
+                firstName: userInfo.firstName,
+                lastName: userInfo.lastName,
+                admin: userInfo.admin,
+            }
+        })
+        setUsersList(usersListData);
+    }
+
     const value = {
         isAuthenticated,
 		login,
         logout,
+        getUsersList,
         user,
         isLoading, 
         loginMessage,
-        logs
+        logs,
+        usersList
 	};
 
     return (
