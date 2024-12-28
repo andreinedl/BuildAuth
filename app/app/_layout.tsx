@@ -1,5 +1,5 @@
 import { PaperProvider } from 'react-native-paper';
-import { View, NativeModules, Text, useColorScheme, StatusBar } from 'react-native'
+import { View, NativeModules, Text, useColorScheme, StatusBar, KeyboardAvoidingView } from 'react-native'
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -45,8 +45,7 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       {/* Set statusbar color */}   
-
-        <SafeAreaView style={{ flex: 1 }}>       
+      <SafeAreaView style={{ flex: 1 }}>  
         <StatusBar backgroundColor={backColor} barStyle={'light-content'} />
           <ToastProvider>
             <AuthProvider>

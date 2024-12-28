@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import { Surface, Icon } from 'react-native-paper'
+import { Surface, Icon, Portal } from 'react-native-paper'
 import theme from  '../theming/theme'
 
 //Import components
@@ -8,6 +8,7 @@ import AccessCard from '../components/HomeComponents/AccessCard'
 import AccessLogs from '../components/HomeComponents/AccessLogs'
 import { useEffect } from 'react'
 import { useBluetooth } from '../contexts/BluetoothContext'
+import PinModal from '../components/Modals/PinModal'
 
 export default function Home() {
     const { connectToDevice } = useBluetooth();
@@ -29,6 +30,7 @@ export default function Home() {
                 <AccessCard />
                 <AccessLogs />
             </Surface>
+            <PinModal/>
         </View>
     )
 }

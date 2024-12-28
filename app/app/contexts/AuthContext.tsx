@@ -14,6 +14,7 @@ interface AuthType {
         allowed: string;
         firstName: string;
         lastName: string;
+        admin: boolean;
     };
     isLoading: boolean;
     isAuthenticated: boolean;
@@ -38,6 +39,7 @@ const AuthProvider = ({ children }: any) => {
         allowed: '',
         firstName: '',
         lastName: '',
+        admin: null,
     }
 
     let log = {

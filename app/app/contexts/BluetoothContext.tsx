@@ -4,6 +4,7 @@ import { Platform, PermissionsAndroid } from 'react-native';
 
 const serviceUUID: string = '0ffe0862-658c-4783-a3d6-9d31211c795f';
 const LockStatusCharacteristicUUID: string = '3d46c16c-17ac-45c7-8638-0e75b4fed4e7';
+const CommunicationsCharacteristicUUID: string = 'e8fa2592-5b6a-4bfa-8a86-f8dccb89f488';
 const BtManager = new BleManager();
 
 interface BluetoothType {
@@ -11,6 +12,8 @@ interface BluetoothType {
     requestBluetoothPermissions: () => Promise<Boolean>
     enableBluetooth: () => Promise<void>
     connectToDevice: () => void
+    requestCode: () => void
+    sendPIN: (pin: number) => void
 
     // Properties
     isConnected: Boolean;
@@ -18,6 +21,10 @@ interface BluetoothType {
     bluetoothState: Boolean;
     lockStatus: Boolean;
     deviceRSSI: number;
+
+    // Connect Modal Properties
+    modalVisibility: boolean;
+    setModalVisibility: (value: boolean) => void,
 }
 
 const useBluetooth = () => {
@@ -32,6 +39,8 @@ const BluetoothProvider = ({ children }: any) => {
     const [lockStatus, setLockStatus] = useState<Boolean>(false);
     const [deviceRSSI, setDeviceRSSI] = useState<number>(0);
     const [lostConnection, setLostConnection] = useState<Boolean>(false);
+    const [modalVisibility, setModalVisibility] = useState<boolean>(false);
+    const [connectedDevice, setConnectedDevice] = useState<Device>();
     
     //monitor rssi task
     const intervalIdRef = useRef(null);
@@ -79,6 +88,7 @@ const BluetoothProvider = ({ children }: any) => {
                 device.connect()
                 .then((device) => device.discoverAllServicesAndCharacteristics()
                 .then((device) => {
+                    setConnectedDevice(device);
                     setIsConnected(true);
                     monitorLockStatus(device);
                     monitorRSSI(device);
@@ -165,22 +175,39 @@ const BluetoothProvider = ({ children }: any) => {
                 stopMonitoringRSSI();
                 setIsConnected(false);
                 setLostConnection(true);
+                setConnectedDevice(device);
                 await device.cancelConnection();
             } catch (error) {
                 console.log('Error', error);
             }
         }
     }
+
+    const requestCode = () => {
+      const message = btoa('requestCode') // convert the string to a base64 message
+      connectedDevice.writeCharacteristicWithoutResponseForService(serviceUUID, CommunicationsCharacteristicUUID, message);
+    }
+
+    const sendPIN = (pin: number) =>
+    {
+
+      const message = btoa(pin.toString()) // the btoa requires a string
+      connectedDevice.writeCharacteristicWithoutResponseForService(serviceUUID, CommunicationsCharacteristicUUID, message);
+    }
     
     const value = {
         enableBluetooth,
         requestBluetoothPermissions,
         connectToDevice,
+        requestCode,
+        sendPIN,
         isConnected,
         lostConnection,
         bluetoothState,
         lockStatus,
         deviceRSSI,
+        modalVisibility,
+        setModalVisibility
 	};
 
     return (

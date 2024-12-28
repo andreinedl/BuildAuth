@@ -1,34 +1,43 @@
-import { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { Modal, Portal, Button, Surface } from "react-native-paper";
-import theme from "../../../../theming/theme";
-import Text from "../../../Text";
+import { useState, useEffect, useRef } from "react";
+import { View, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { Modal, Portal, Button, Surface, TextInput } from "react-native-paper";
+import Text from "../Text";
+import theme from "../../theming/theme";
 import { PaperOtpInput } from 'react-native-paper-otp-input';
+import { useBluetooth } from "../../contexts/BluetoothContext";
 
-export default function UnlockModal(props: { visible: boolean, onClose: Function }) {
-    const [modalVisibility, setModalVisibility] = useState(props.visible);
+export default function PinModal() {
+    const { modalVisibility, setModalVisibility, sendPIN } = useBluetooth()
     const [otp, setOtp] = useState<string>(null)
 
-    useEffect(() => {
-        setModalVisibility(props.visible);
-    }, [props.visible]);
+    /*useEffect(() => {
+        setModalVisibility(modalVisibility);
+    }, [modalVisibility]);*/
 
-    const handleClose = () => {
+    const handleSend = () => {
+        if(otp.length < 6) {
+            //todo
+        } else {
+            sendPIN(parseInt(otp));
+            closeModal()
+        }
+    }
+
+    const closeModal = () => {
         setModalVisibility(false);
-        props.onClose();
     };
 
     return (
         <Portal>
             <Modal 
                 visible={modalVisibility} 
-                onDismiss={() => handleClose()} 
+                onDismiss={() => closeModal()} 
                 contentContainerStyle={styles.modalContainer}
                 style={styles.modal}
                 dismissableBackButton={true}
             >
                 <View style={styles.content}>
-                    <Text variant="headlineMedium" textVariant="bold">Unlock</Text>
+                    <Text variant="headlineMedium" textVariant="bold">PIN</Text>
                     <Text variant="titleMedium" textVariant="normal" style={{ marginTop: 15 }}>
                         Please enter the PIN displayed on the screen:
                     </Text>
@@ -43,13 +52,13 @@ export default function UnlockModal(props: { visible: boolean, onClose: Function
                     /> 
                     <Button 
                         mode="contained" 
-                        onPress={() => handleClose()} 
+                        onPress={() => handleSend()} 
                         theme={{ roundness: 2 }} 
                         style={styles.unlockButton}
                     >
                         Unlock
                     </Button>
-                    <Button onPress={() => handleClose()}>Close</Button>
+                    <Button onPress={() => closeModal()} style={styles.closeButton} buttonColor="white" theme={{ roundness: 2 }}>Close</Button>
                 </View>
             </Modal>
         </Portal>
@@ -66,10 +75,10 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     modalContainer: {
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.colors.surface,
         padding: 20,
         borderRadius: 10,
-        margin: 20,
+        margin: 10,
     },
     content: {
         justifyContent: "center",
@@ -82,8 +91,13 @@ const styles = StyleSheet.create({
     otpBox: {
         backgroundColor: theme.colors.surface,
         borderRadius: 5,
+        margin: 3
     },
     unlockButton: {
         width: "70%",
+    },
+    closeButton: {
+        marginTop: 10,
+        width: "30%"
     }
 });

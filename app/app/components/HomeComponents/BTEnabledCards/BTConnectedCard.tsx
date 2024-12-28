@@ -7,14 +7,13 @@ import i18n from "../../../localization/locale";
 //Bluetooth
 import { useBluetooth } from '../../../contexts/BluetoothContext';
 
-//Buttons modals
-import UnlockModal from './Modals/UnlockModal';
-
 export default function BTConnectedCard() {
-    const { lockStatus, deviceRSSI } = useBluetooth();
-    const [modalVisibility, setModalVisibility] = React.useState(false);
+    const { lockStatus, deviceRSSI, setModalVisibility, requestCode } = useBluetooth();
 
-    const openModal = () => setModalVisibility(true); 
+    const openModal = () => {
+        requestCode();
+        setModalVisibility(true);
+    }
     const closeModal = () => setModalVisibility(false);
 
     if(deviceRSSI < -65) {
@@ -50,7 +49,6 @@ export default function BTConnectedCard() {
                         )}
                     </Surface>
                 </View>
-                <UnlockModal visible={modalVisibility} onClose={closeModal}/>
             </>
         )
     }
@@ -61,17 +59,18 @@ const styles = StyleSheet.create({
         marginTop: 45,
         width: "100%",
         height: "25%",
+        minHeight: "25%",
         justifyContent: "center",
         alignItems: "center"
     },
     surface: {
         width: "82%",
-        height: "100%",
+        height: 200,
         borderRadius: 15,
         justifyContent: "center",
         alignItems: "center",
         gap: 15,
-        flexShrink: 1
+        //flexShrink: 1
     },
     button: {
         width: 250
