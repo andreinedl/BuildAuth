@@ -48,6 +48,12 @@ interface AuthType {
     userToDelete: User;
     showDeleteDialog: (user: User) => void;
     deleteDialogVisibility: boolean;
+
+    //create user
+    createUser: (username : string, email: string, firstName: string, lastName: string, password: string, allowed: boolean, admin: boolean) => Promise<String>;
+    setCreateDialogVisibility: (value: boolean) => void;
+    showCreateDialog: () => void;
+    createDialogVisibility: boolean;
 }
 
 const AuthContext = createContext<AuthType>(undefined);
@@ -61,10 +67,10 @@ const AuthProvider = ({ children }: any) => {
         username: '',
         email: '',
         lastAccess: '',
-        allowed: false,  // Changed from null to false
+        allowed: false, 
         firstName: '',
         lastName: '',
-        admin: false,    // Changed from null to false
+        admin: false,
     }
 
     let log = {
@@ -87,6 +93,9 @@ const AuthProvider = ({ children }: any) => {
     //delete user
     const [deleteDialogVisibility, setDeleteDialogVisibility] = React.useState<boolean>(false);
     const [userToDelete, setUserToDelete] = React.useState<User>(userInfo);
+
+    //create user
+    const [createDialogVisibility, setCreateDialogVisibility] = React.useState<boolean>(false);
 
     const login = async (username: string, password: string): Promise<String> => {
         try {
@@ -198,6 +207,41 @@ const AuthProvider = ({ children }: any) => {
             }, { timeout: 5000 })
             setLoading(false);
             getUsersList();
+            setDeleteDialogVisibility(false);
+            return "success";
+        } catch (error) {
+            if (!error.response) {
+                setLoading(false);
+                setDeleteDialogVisibility(false);
+                return "timeout";
+            } else {
+                setLoading(false);
+                setDeleteDialogVisibility(false);
+                return "failed";
+            }
+        }
+    }
+
+    const showDeleteDialog = (user: User) => {
+        if (!user) return;
+        setUserToDelete(user);
+        setDeleteDialogVisibility(true);
+    }
+
+    //Create user dialog + logic
+    const createUser = async (username : string, email: string, firstName: string, lastName: string, password: string, allowed: boolean, admin: boolean) : Promise<String> => {
+        try {
+            setLoading(true);
+            const response = await axios.post(`${config.apiUrl}/users/create`, {
+                username: username,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                password: password,
+                allowed: allowed,
+            }, { timeout: 5000 })
+            setLoading(false);
+            getUsersList();
             return "success";
         } catch (error) {
             if (!error.response) {
@@ -210,13 +254,12 @@ const AuthProvider = ({ children }: any) => {
         }
     }
 
-    const showDeleteDialog = (user: User) => {
-        if (!user) return;
-        setUserToDelete(user);
-        setDeleteDialogVisibility(true);
+    const showCreateDialog = () => {
+        setCreateDialogVisibility(true);
     }
 
     const value = {
+        //Auth
         isAuthenticated,
 		login,
         logout,
@@ -226,16 +269,26 @@ const AuthProvider = ({ children }: any) => {
         loginMessage,
         logs,
         usersList,
+
+        //Edit user
         editDialogVisibility,
         setEditDialogVisibility,
         userToEdit,
         showEditDialog,
         editUser,
+
+        //Delete user
         deleteUser,
         setDeleteDialogVisibility,
         userToDelete,
         showDeleteDialog,
         deleteDialogVisibility,
+
+        //Create user
+        createUser,
+        createDialogVisibility,
+        setCreateDialogVisibility,
+        showCreateDialog
 	};
 
     return (

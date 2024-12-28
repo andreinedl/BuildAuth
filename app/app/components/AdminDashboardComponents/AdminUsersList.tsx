@@ -7,7 +7,7 @@ import EditUserDialog from "../Dialogs/EditUserDialog";
 import i18n from "../../localization/locale";
 
 export default function AdminUsersList() {
-    const { usersList, showEditDialog, showDeleteDialog, getUsersList } = useAuth();
+    const { usersList, showEditDialog, showDeleteDialog, getUsersList, showCreateDialog } = useAuth();
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
@@ -16,6 +16,9 @@ export default function AdminUsersList() {
             </Text>
             <Button icon="reload" onPress={() => getUsersList()}>
                 Refresh
+            </Button>
+            <Button icon="plus" onPress={showCreateDialog} buttonColor="green" textColor="white" style={{ marginBottom: 10, height: 50, justifyContent: 'center' }}>
+                {i18n.t('CreateUser')}
             </Button>
             <ScrollView>
                 {usersList.map((user, index) => (

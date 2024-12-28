@@ -15,10 +15,8 @@ export default function DeleteUserDialog() {
 
     const handleDelete = () => {
         deleteUser(userToDelete.username).then((response) => {
-            hideDialog();
             if (response === 'success') {
                 toast.show({ message: i18n.t('UserDeleted'), duration: 2000, type: 'success' });
-                hideDialog();
             } else if (response === 'timeout') {
                 toast.show({ message: i18n.t('APIUnreachable'), duration: 2000, type: 'error' });
             } else {

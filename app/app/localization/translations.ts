@@ -1,3 +1,5 @@
+import { Cancel } from "axios"
+
 const translations = {
     en: {
         LoginGreetingH1: 'Hello 👋',
@@ -38,7 +40,10 @@ const translations = {
         Save: "Save",
         Edit: "Edit",
         Delete: "Delete",
+        Cancel: "Cancel",
         DeleteUserDialogText: "Are you sure you want to delete this user?",
+        CreateUserDialogText: "Create User",
+        CreateUser: "Create User",
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -79,7 +84,10 @@ const translations = {
         Save: "Salvează",
         Edit: "Editează",
         Delete: "Șterge",
+        Cancel: "Anulează",
         DeleteUserDialogText: "Sunteți sigur că doriți să ștergeți acest utilizator?",
+        CreateUserDialogText: "Creează utilizator",
+        CreateUser: "Creează Utilizator",
     }
 }
 

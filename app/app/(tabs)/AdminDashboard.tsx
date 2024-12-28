@@ -5,6 +5,7 @@ import AdminHeader from "../components/AdminDashboardComponents/AdminHeader";
 import AdminUsersList from "../components/AdminDashboardComponents/AdminUsersList";
 import EditUserDialog from "../components/Dialogs/EditUserDialog";
 import DeleteUserDialog from "../components/Dialogs/DeleteUserDialog";
+import CreateUserDialog from "../components/Dialogs/CreateUserDialog";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function AdminDashboard() {
@@ -24,6 +25,7 @@ export default function AdminDashboard() {
             </Surface>
             <EditUserDialog/>
             <DeleteUserDialog/>
+            <CreateUserDialog/>
         </View>
     )
 }
