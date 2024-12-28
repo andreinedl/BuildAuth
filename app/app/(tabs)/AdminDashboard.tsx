@@ -4,6 +4,7 @@ import theme from "../theming/theme";
 import AdminHeader from "../components/AdminDashboardComponents/AdminHeader";
 import AdminUsersList from "../components/AdminDashboardComponents/AdminUsersList";
 import EditUserDialog from "../components/Dialogs/EditUserDialog";
+import DeleteUserDialog from "../components/Dialogs/DeleteUserDialog";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function AdminDashboard() {
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
                 <AdminUsersList />
             </Surface>
             <EditUserDialog/>
+            <DeleteUserDialog/>
         </View>
     )
 }

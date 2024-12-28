@@ -4,15 +4,19 @@ import { useAuth } from "../../contexts/AuthContext";
 import theme from "../../theming/theme";
 import { useState } from "react";
 import EditUserDialog from "../Dialogs/EditUserDialog";
+import i18n from "../../localization/locale";
 
 export default function AdminUsersList() {
-    const { usersList, showEditDialog } = useAuth();
+    const { usersList, showEditDialog, showDeleteDialog, getUsersList } = useAuth();
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
             <Text variant="headlineMedium" style={{ marginBottom: 20, textAlign: 'center' }}>
                 Users Management
             </Text>
+            <Button icon="reload" onPress={() => getUsersList()}>
+                Refresh
+            </Button>
             <ScrollView>
                 {usersList.map((user, index) => (
                     <Surface
@@ -86,8 +90,19 @@ export default function AdminUsersList() {
                                     mode="contained"
                                     onPress={() => showEditDialog(user)}
                                     icon="pencil"
+                                    textColor="black"
+                                    buttonColor="#FFC300"
+                                    style={{ marginBottom: 10 }}
                                 >
-                                    Edit User
+                                    {i18n.t('Edit')}
+                                </Button>
+                                <Button 
+                                    mode="contained"
+                                    onPress={() => showDeleteDialog(user)}
+                                    icon="delete-forever"
+                                    textColor="black"
+                                >
+                                    {i18n.t('Delete')}
                                 </Button>
                             </View>
                         </List.Accordion>

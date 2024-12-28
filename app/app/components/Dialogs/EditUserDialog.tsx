@@ -4,33 +4,43 @@ import { Dialog, Portal, TextInput, Switch, Button, Text, Checkbox } from "react
 import i18n from "../../localization/locale";
 import { useAuth, User } from "../../contexts/AuthContext";
 import theme from "../../theming/theme";
+import { useToast } from "react-native-paper-toast";
 
-interface Props {
-    user: User
-}
-
-export default function EditUserDialog() {
-
-    const { editDialogVisibility, setEditDialogVisibility, editUser } = useAuth() 
+export default function userToEditDialog() {
+    const toast = useToast(); // https://github.com/kuasha420/react-native-paper-toast
+    const { editDialogVisibility, setEditDialogVisibility, userToEdit, editUser } = useAuth() 
 
     useEffect(() => {
-        if (editUser) {
-            setEmail(editUser.email);
-            setFirstName(editUser.firstName);
-            setLastName(editUser.lastName);
-            setAllowed(editUser.allowed);
-            setAdmin(editUser.admin);
+        if (userToEdit) {
+            setEmail(userToEdit.email);
+            setFirstName(userToEdit.firstName);
+            setLastName(userToEdit.lastName);
+            setAllowed(userToEdit.allowed);
+            setAdmin(userToEdit.admin);
         }
-    }, [editUser]);
+    }, [userToEdit]);
     const showDialog = () => setEditDialogVisibility(true);
     const hideDialog = () => setEditDialogVisibility(false);
 
-    const [email, setEmail] = useState<string>(editUser.email);
+    const [email, setEmail] = useState<string>(userToEdit.email);
     const [password, setPassword] = useState<string>();
-    const [firstName, setFirstName] = useState<string>(editUser.firstName);
-    const [lastName, setLastName] = useState<string>(editUser.lastName);
-    const [allowed, setAllowed] = useState<boolean>(editUser.allowed);
-    const [admin, setAdmin] = useState<boolean>(editUser.admin);
+    const [firstName, setFirstName] = useState<string>(userToEdit.firstName);
+    const [lastName, setLastName] = useState<string>(userToEdit.lastName);
+    const [allowed, setAllowed] = useState<boolean>(userToEdit.allowed);
+    const [admin, setAdmin] = useState<boolean>(userToEdit.admin);
+
+    const handleSave = () => {
+        editUser(userToEdit.username, email, firstName, lastName, password, allowed, admin).then((response) => {
+            if (response === 'success') {
+                toast.show({ message: i18n.t('UserEdited'), duration: 2000, type: 'success' });
+                hideDialog();
+            } else if (response === 'timeout') {
+                toast.show({ message: i18n.t('APIUnreachable'), duration: 2000, type: 'error' });
+            } else {
+                toast.show({ message: i18n.t('UnknownError'), duration: 2000, type: 'error' });
+            }
+        });
+    }
 
     return (
         <Portal>
@@ -77,13 +87,24 @@ export default function EditUserDialog() {
                         theme={{ roundness: 12 }}
                     />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text>"</Text>
+                        <Text>{i18n.t('Allowed')}</Text>
                         <Checkbox status={allowed ? 'checked' : 'unchecked'} onPress={() => {setAllowed(!allowed)}}/>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
                         <Text>Admin</Text>
                         <Checkbox status={admin ? 'checked' : 'unchecked'} onPress={() => {setAdmin(!admin)}}/>
                     </View>
+
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            handleSave();
+                        }}
+                        style={{ marginTop: 15 }}
+                        theme={theme}
+                    >
+                        {i18n.t('Save')}
+                    </Button>
                 </Dialog.Content>
             </Dialog>
         </Portal>

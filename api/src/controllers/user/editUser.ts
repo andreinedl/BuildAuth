@@ -26,14 +26,20 @@ export async function editUser(req: Request, res: Response, next: NextFunction) 
             return;
         }
 
-        if(email == undefined) email = user.getDataValue('email');
-        if(firstName == undefined) firstName = user.getDataValue('firstName');
-        if(lastName == undefined) lastName = user.getDataValue('lastName');
-        if(allowed == undefined) allowed = user.getDataValue('allowed');
-        if(admin == undefined) admin = user.getDataValue('admin');
-        if(password == undefined) password = user.getDataValue('password');
+        const updates: any = {
+            email: email ?? user.getDataValue('email'),
+            firstName: firstName ?? user.getDataValue('firstName'),
+            lastName: lastName ?? user.getDataValue('lastName'),
+            allowed: allowed ?? user.getDataValue('allowed'),
+            admin: admin ?? user.getDataValue('admin'),
+        };
 
-        user.update({ email: email, firstName: firstName, lastName: lastName, allowed: allowed, admin: admin, password: hashSync(password, 10) }).then(() => {
+        // Include password only if not undefined
+        if (password !== undefined) {
+            updates.password = hashSync(password, 10);
+        }
+
+        user.update(updates).then(() => {
             res.status(200).json({
                 message: 'User updated'
             })

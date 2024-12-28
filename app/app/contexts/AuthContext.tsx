@@ -35,11 +35,19 @@ interface AuthType {
         admin: boolean,
     }>;
 
-    //edit dialog props
+    //edit user
     editDialogVisibility: boolean,
     setEditDialogVisibility: (value: boolean) => void,
-    editUser: User,
+    userToEdit: User,
     showEditDialog: (user: User) => void
+    editUser: (username : string, email: string, firstName: string, lastName: string, password: string, allowed: boolean, admin: boolean) => Promise<String>;
+
+    //delete user
+    deleteUser: (username: string) => Promise<String>;
+    setDeleteDialogVisibility: (value: boolean) => void;
+    userToDelete: User;
+    showDeleteDialog: (user: User) => void;
+    deleteDialogVisibility: boolean;
 }
 
 const AuthContext = createContext<AuthType>(undefined);
@@ -74,7 +82,11 @@ const AuthProvider = ({ children }: any) => {
 
     //edit dialog props
     const [editDialogVisibility, setEditDialogVisibility] = React.useState<boolean>(false);
-    const [editUser, setEditUser] = React.useState<User>(userInfo);
+    const [userToEdit, setUserToEdit] = React.useState<User>(userInfo);
+
+    //delete user
+    const [deleteDialogVisibility, setDeleteDialogVisibility] = React.useState<boolean>(false);
+    const [userToDelete, setUserToDelete] = React.useState<User>(userInfo);
 
     const login = async (username: string, password: string): Promise<String> => {
         try {
@@ -109,6 +121,7 @@ const AuthProvider = ({ children }: any) => {
         }
     }
 
+    //Get logs
     const getLogs = async() => {
         const response = await axios.get(`${config.apiUrl}/logs/`, { timeout: 5000 })
         let logsData = response.data.map(log => {
@@ -121,6 +134,7 @@ const AuthProvider = ({ children }: any) => {
         setLogs(logsData);
     }
 
+    //Get users list
     const getUsersList = async() => {
         const response = await axios.get(`${config.apiUrl}/users/`, { timeout: 5000 })
         const usersListData: User[] = response.data.map((userInfo: User) => ({
@@ -135,10 +149,71 @@ const AuthProvider = ({ children }: any) => {
         setUsersList(usersListData);
     }
 
+    //Edit user dialog + logic
     const showEditDialog = (user: User) => {
         if (!user) return;
-        setEditUser(user);
+        setUserToEdit(user);
         setEditDialogVisibility(true);
+    }
+
+    const editUser = async (username : string, email: string, firstName: string, lastName: string, password: string, allowed: boolean, admin: boolean) : Promise<String> => {
+        try {
+            setLoading(true);
+            
+            if(password === '' || password === undefined) {
+                password = undefined;
+            } else {
+                password = password;
+            }
+
+            const response = await axios.post(`${config.apiUrl}/users/edit`, {
+                username: username,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                password: password,
+                allowed: allowed,
+                admin: admin
+            }, { timeout: 5000 })
+            setLoading(false);
+            getUsersList();
+            return "success";
+        } catch (error) {
+            if (!error.response) {
+                setLoading(false);
+                return "timeout";
+            } else {
+                setLoading(false);
+                return "failed";
+            }
+        }
+    }
+
+    //Delete user dialog + logic
+    const deleteUser = async (username: string) => {
+        try {
+            setLoading(true);
+            const response = await axios.post(`${config.apiUrl}/users/delete`, {
+                username: username
+            }, { timeout: 5000 })
+            setLoading(false);
+            getUsersList();
+            return "success";
+        } catch (error) {
+            if (!error.response) {
+                setLoading(false);
+                return "timeout";
+            } else {
+                setLoading(false);
+                return "failed";
+            }
+        }
+    }
+
+    const showDeleteDialog = (user: User) => {
+        if (!user) return;
+        setUserToDelete(user);
+        setDeleteDialogVisibility(true);
     }
 
     const value = {
@@ -153,8 +228,14 @@ const AuthProvider = ({ children }: any) => {
         usersList,
         editDialogVisibility,
         setEditDialogVisibility,
+        userToEdit,
+        showEditDialog,
         editUser,
-        showEditDialog
+        deleteUser,
+        setDeleteDialogVisibility,
+        userToDelete,
+        showDeleteDialog,
+        deleteDialogVisibility,
 	};
 
     return (
