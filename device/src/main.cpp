@@ -1,4 +1,8 @@
 #include <Arduino.h>
+//wifi
+#include <WiFi.h>
+#include "HTTPClient.h"
+
 //Include the libraries for the BLE
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -23,6 +27,30 @@
 #define COMMUNICATION_CHARACTERISTIC_UUID "e8fa2592-5b6a-4bfa-8a86-f8dccb89f488" //generated using https://www.uuidgenerator.net/
 #define LED_PIN 5
 
+//wifi
+const char* ssid = "#########";
+const char* password = "#######";
+unsigned long previousMillis = 0;
+unsigned long interval = 30000;
+//Your Domain name with URL path or IP address with path
+const char* serverName = "http://158.101.197.72/api/logs/create";
+HTTPClient http;
+WiFiClient client;
+
+void initWiFi() {
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi ..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(1000);
+  }
+
+  if(WiFi.status() == WL_CONNECTED) {
+    Serial.println("Connected to the WiFi network");
+  }
+  Serial.println(WiFi.localIP());
+}
+
 //code generation timers
 unsigned long codeGenMillis = 0;
 int codeDuration = 0;
@@ -39,12 +67,35 @@ int connectCode;
 
 volatile boolean codeCountdown = false;
 
+String lastActionUsername = "";
+
 //define the screen object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 boolean lockStatus;
 
-void setLockStatus(boolean status) {
+void sendActionLog(String username, String action) {
+  if(!username || !action || username == "" || action == "") {
+    return;
+  }
+
+  http.begin(client, serverName);
+  http.addHeader("Content-Type", "application/json");
+  String payload = "{\"username\":\"" + username + "\",\"message\":\"" + action + "\"}";
+  int httpResponseCode = http.POST(payload);
+  if(httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println(httpResponseCode);
+    Serial.println(response);
+  } else {
+    Serial.print("Error on sending POST: ");
+    Serial.println(httpResponseCode);
+  }
+  http.end();
+}
+
+void setLockStatus(boolean status, String username) {
+  boolean previousLockStatus = lockStatus;
   lockStatus = status;
   BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
   BuildAuthStatusCharacteristic->notify();
@@ -57,14 +108,27 @@ void setLockStatus(boolean status) {
   display.setCursor(18,0);
   display.println(lockStatusText);
 
-  //draw the lock/unlock icon
-  if(lockStatus == true) {
-    display.drawBitmap(48, 15, lockIcon, 32, 32, WHITE);
-  } else {
-    display.drawBitmap(48, 15, unlockIcon, 32, 32, WHITE);
+  //display the name and username
+  //if the name and username are empty, do not display them
+  if(username != "") {
+    display.setCursor(0, 20);
+    String message = "User: " + username;
+    display.println(message);
   }
 
+  //draw the lock/unlock icon
+  if(lockStatus == true) {
+    display.drawBitmap(48, 30, lockIcon, 32, 32, WHITE);
+  } else {
+    display.drawBitmap(48, 30, unlockIcon, 32, 32, WHITE);
+  }
   display.display();
+  
+  if(username == lastActionUsername && previousLockStatus == lockStatus) {
+    return;
+  } else {
+    sendActionLog(username, lockStatus ? "locked" : "unlocked");
+  }
 }
 
 void generateConnectCode() {
@@ -88,7 +152,7 @@ void updateCountdown() {
       codeDuration--;
       
       if (codeDuration <= 0) {
-        setLockStatus(lockStatus);
+        setLockStatus(lockStatus, lastActionUsername);
       } else {
         display.clearDisplay();
         display.display();
@@ -123,16 +187,29 @@ class ServerCallbacks: public BLEServerCallbacks {
 
 class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) override {
-    String value = pCharacteristic->getValue().c_str();
+    std::string value = pCharacteristic->getValue();
     Serial.print("Raw value: ");
-    Serial.print(value);
+    Serial.print(value.c_str());
     Serial.print("\n");
 
     if(value.length() > 0) {  
       if(value == "requestCode") {
         generateConnectCode();
-      } else if(value == String(connectCode)) {
-        setLockStatus(!lockStatus);
+      } else {
+        std::string code = value.substr(0, value.find(','));
+        Serial.print("Code: ");
+        Serial.print(code.c_str());
+        Serial.print("\n");
+
+        if(code == String(connectCode).c_str()) {
+          String username  = value.substr(value.find(',') + 1).c_str();
+          Serial.print("Username: ");
+          Serial.print(username.c_str());
+          Serial.print("\n");
+
+          lastActionUsername = username;
+          setLockStatus(!lockStatus, username);
+        }
       }
     }
   }
@@ -140,6 +217,10 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
 
 void setup() {
   Serial.begin(115200);
+
+  initWiFi();
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
 
   //initialize the display
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -206,7 +287,7 @@ void setup() {
   Serial.println("Waiting for a client connection to notify...");
 
   //set the default value for lockstatus
-  setLockStatus(true);
+  setLockStatus(true, "");
 }
 
 void loop() {
@@ -221,5 +302,14 @@ void loop() {
     pServer->startAdvertising(); // Restart advertising
     Serial.println("Start advertising");
     oldDeviceConnected = deviceConnected;
+  }
+
+  unsigned long currentMillis = millis();
+  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousMillis = currentMillis;
   }
 }

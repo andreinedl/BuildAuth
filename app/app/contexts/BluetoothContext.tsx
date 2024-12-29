@@ -1,11 +1,14 @@
 import { BleManager, Device, State } from 'react-native-ble-plx';
 import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { Platform, PermissionsAndroid } from 'react-native';
+import { btoa, atob } from 'react-native-quick-base64'
 
 const serviceUUID: string = '0ffe0862-658c-4783-a3d6-9d31211c795f';
 const LockStatusCharacteristicUUID: string = '3d46c16c-17ac-45c7-8638-0e75b4fed4e7';
 const CommunicationsCharacteristicUUID: string = 'e8fa2592-5b6a-4bfa-8a86-f8dccb89f488';
 const BtManager = new BleManager();
+
+import { useAuth, User } from './AuthContext';
 
 interface BluetoothType {
     // Methods
@@ -13,7 +16,7 @@ interface BluetoothType {
     enableBluetooth: () => Promise<void>
     connectToDevice: () => void
     requestCode: () => void
-    sendPIN: (pin: number) => void
+    sendPIN: (pin: number, user: User) => void
 
     // Properties
     isConnected: Boolean;
@@ -196,10 +199,9 @@ const BluetoothProvider = ({ children }: any) => {
       connectedDevice.writeCharacteristicWithoutResponseForService(serviceUUID, CommunicationsCharacteristicUUID, message);
     }
 
-    const sendPIN = (pin: number) =>
+    const sendPIN = (pin: number, user: User) =>
     {
-
-      const message = btoa(pin.toString()) // the btoa requires a string
+      const message = btoa(`${pin.toString()},${user.username}`) // the btoa requires a string
       connectedDevice.writeCharacteristicWithoutResponseForService(serviceUUID, CommunicationsCharacteristicUUID, message);
     }
     

@@ -10,9 +10,6 @@ export default function CreateUserDialog() {
     const toast = useToast(); // https://github.com/kuasha420/react-native-paper-toast
     const { createDialogVisibility, createUser, setCreateDialogVisibility } = useAuth() 
 
-    const showDialog = () => setCreateDialogVisibility(true);
-    const hideDialog = () => setCreateDialogVisibility(false);
-
     const [username, setUsername] = useState<string>();
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
@@ -20,6 +17,21 @@ export default function CreateUserDialog() {
     const [lastName, setLastName] = useState<string>();
     const [allowed, setAllowed] = useState<boolean>();
     const [admin, setAdmin] = useState<boolean>();
+
+    
+    const showDialog = () => setCreateDialogVisibility(true);
+
+    //reset the values each time you close the dialog
+    const hideDialog = () => { 
+        setCreateDialogVisibility(false) 
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setFirstName('');
+        setLastName('');
+        setAllowed(false);
+        setAdmin(false);
+    }
 
     const handleSave = () => {
         createUser(username, email, firstName, lastName, password, allowed, admin).then((response) => {
@@ -105,6 +117,16 @@ export default function CreateUserDialog() {
                         theme={theme}
                     >
                         {i18n.t('Save')}
+                    </Button>
+                    <Button
+                        mode="outlined"
+                        onPress={() => {
+                            hideDialog();
+                        }}
+                        style={{ marginTop: 15 }}
+                        theme={theme}
+                    >
+                        {i18n.t('Cancel')}
                     </Button>
                 </Dialog.Content>
             </Dialog>

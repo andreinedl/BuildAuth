@@ -5,10 +5,12 @@ import Text from "../Text";
 import theme from "../../theming/theme";
 import { PaperOtpInput } from 'react-native-paper-otp-input';
 import { useBluetooth } from "../../contexts/BluetoothContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function PinModal() {
     const { modalVisibility, setModalVisibility, sendPIN } = useBluetooth()
     const [otp, setOtp] = useState<string>(null)
+    const { user } = useAuth();
 
     /*useEffect(() => {
         setModalVisibility(modalVisibility);
@@ -18,7 +20,8 @@ export default function PinModal() {
         if(otp.length < 6) {
             //todo
         } else {
-            sendPIN(parseInt(otp));
+            console.log(user)
+            sendPIN(parseInt(otp), user);
             closeModal()
         }
     }
