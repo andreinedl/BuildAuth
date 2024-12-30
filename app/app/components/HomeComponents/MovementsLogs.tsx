@@ -42,15 +42,11 @@ export default function MovementsLogs({ visible }: Props) {
             data={movements}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
-            style={{ 
-                width: "90%", 
-                height: "40%", 
-                marginTop: 10
-            }}
             showsVerticalScrollIndicator={true}
             initialNumToRender={10}
             maxToRenderPerBatch={10}
             windowSize={5}
+            style={{ marginTop: 10, overflow: "hidden" }}
         />
     );
 }

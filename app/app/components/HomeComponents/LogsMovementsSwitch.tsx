@@ -19,7 +19,7 @@ export default function LogsMovementsSwitch() {
     }
 
     return (
-        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 40 }}>
+        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 40, flex: 1, marginBottom: 20 }}>
             <SegmentedButtons 
                 value={segmentedButtonValue} 
                 onValueChange={value => setSegmentedButtonValue(value)} 
@@ -37,9 +37,10 @@ export default function LogsMovementsSwitch() {
             />
 
             <Button mode="contained" icon="refresh" onPress={onRefresh} style={{ marginTop: 10, width: "60%"}}>Refresh</Button>
-
-            <AccessLogs visible={segmentedButtonValue === 'logs'} />
-            <MovementsLogs visible={segmentedButtonValue === 'movements'} />
+            <View style={{ flex: 1, width: "90%", marginTop: 10 }}>
+                <AccessLogs visible={segmentedButtonValue === 'logs'} />
+                <MovementsLogs visible={segmentedButtonValue === 'movements'} />
+            </View>
 
         </View>
     )

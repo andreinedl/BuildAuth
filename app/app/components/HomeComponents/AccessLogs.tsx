@@ -59,11 +59,6 @@ export default function AccessLogs({ visible }: Props) {
             data={logs}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
-            style={{ 
-                width: "90%", 
-                height: "40%", 
-                marginTop: 10
-            }}
             showsVerticalScrollIndicator={true}
             initialNumToRender={10}
             maxToRenderPerBatch={10}

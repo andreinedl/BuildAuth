@@ -17,9 +17,10 @@ export default function UserInfo() {
                 height: "97%", 
                 alignSelf: 'center',
                 borderRadius: 20,
+                overflow: "hidden",
+                padding: 10
             }}>
-                <View>
-
+                <View style={{ flex: 1 }}>
                     {/* Account icon + full name */}
                     <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", paddingTop: 30 }}>
                         <Icon source="account-circle-outline" size={130}/>
@@ -27,7 +28,7 @@ export default function UserInfo() {
                     </View>
 
                     {/* Account info */}
-                    <View style={{ marginLeft: 15, marginTop: 20 }}>
+                    <View style={{ marginLeft: 15, marginTop: 20, flex: 1 }}>
                         <List.Section>
                             <List.Subheader>Account info:</List.Subheader>
                             <List.Item 
@@ -53,18 +54,17 @@ export default function UserInfo() {
                     </View>
 
                     {/* Account actions */}
-                    <View style={{ marginTop: 30 }}>
+                    <View style={{ marginBottom: 20 }}>
                         <Button 
                             icon="logout" 
                             mode="contained" 
                             theme={{ roundness: 2 }} 
-                            style={{ marginTop: 15, marginBottom: 20, minWidth: 200, alignSelf: "center" }} 
+                            style={{ minWidth: 200, alignSelf: "center" }} 
                             labelStyle={{ fontSize: 15 }} 
                             onPress={logout}>
                                 {i18n.t("logout")}
                         </Button>
                     </View>
-
                 </View>
             </Surface>
         </View>

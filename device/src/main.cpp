@@ -32,7 +32,7 @@
 #define SCL_PIN 33
 
 //########## WIFI ##########
-const char* ssid = "########";
+const char* ssid = "###########";
 const char* password = "###########";
 unsigned long previousMillis = 0;
 unsigned long interval = 30000;
@@ -352,7 +352,7 @@ void setup() {
   pinMode(MOTIONSENSOR_PIN, INPUT);
 
   //set buzzer to off
-  stopBuzzerBeep();
+  //stopBuzzerBeep();
 
   //initialize the wifi
   initWiFi();
@@ -412,7 +412,7 @@ void setup() {
   Serial.println("Waiting for a client connection to notify...");
 
   //Set the default value for lockstatus
-  setLockStatus(true, "");
+  setLockStatus(false, "");
 }
 
 void loop() {
@@ -426,11 +426,12 @@ void loop() {
     previousMillis = currentMillis;
   }
 
-  if(lockStatus == true) {
+  if(lockStatus == true && codeGenerated == false) {
     checkForMovement();
   }
 
   if(lockStatus == false) {
-    stopBuzzerBeep();
+    noTone(BUZZER_PIN);
+    digitalWrite(BUZZER_PIN, HIGH);
   }
 }

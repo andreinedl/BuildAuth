@@ -1,7 +1,6 @@
 import { BleManager, Device, State } from 'react-native-ble-plx';
 import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { Platform, PermissionsAndroid } from 'react-native';
-import { btoa, atob } from 'react-native-quick-base64'
 
 const serviceUUID: string = '0ffe0862-658c-4783-a3d6-9d31211c795f';
 const LockStatusCharacteristicUUID: string = '3d46c16c-17ac-45c7-8638-0e75b4fed4e7';

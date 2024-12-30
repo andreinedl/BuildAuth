@@ -3,8 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import BTEnabledCard from './BTEnabledCard'
 import BTDisabledCard from './BTDisabledCard'
 import BTNotSupportedCard from './BTNotSupportedCard'
-import theme from  '../../theming/theme'
-import LoadingCard from './LoadingCard'
 
 //Bluetooth
 import { BtManager } from '../../contexts/BluetoothContext';
