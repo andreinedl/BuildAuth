@@ -17,6 +17,7 @@
 //Include the icons
 #include "lockIcon.cpp"
 #include "unlockIcon.cpp"
+#include "eyeIcon.cpp"
 
 #define SCREEN_WIDTH 128 // pixels
 #define SCREEN_HEIGHT 64 // pixels
@@ -30,7 +31,7 @@
 #define SDA_PIN 32
 #define SCL_PIN 33
 
-//wifi
+//########## WIFI ##########
 const char* ssid = "########";
 const char* password = "###########";
 unsigned long previousMillis = 0;
@@ -46,12 +47,15 @@ void initWiFi() {
     Serial.print('.');
     delay(1000);
   }
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
 
   if(WiFi.status() == WL_CONNECTED) {
     Serial.println("Connected to the WiFi network");
   }
   Serial.println(WiFi.localIP());
 }
+//####################
 
 //code generation timers
 unsigned long codeGenMillis = 0;
@@ -67,6 +71,7 @@ boolean oldDeviceConnected = false;
 int connectCode;
 volatile boolean codeCountdown = false;
 String lastActionUsername = "";
+boolean codeGenerated = false;
 
 //define the screen object
 TwoWire DISPLAY_PINS = TwoWire(0);
@@ -80,12 +85,47 @@ boolean lockStatus;
 
 int devicesConnected = 0;
 
+//Get the centered x position of the text
+int16_t getXCenterPosition(String text) {
+  int16_t x1, y1;
+  uint16_t textWidth, textHeight;
+  display.getTextBounds(text, 0, 0, &x1, &y1, &textWidth, &textHeight);
+  return (SCREEN_WIDTH - textWidth) / 2;
+}
+
+//Get the centered x position of the text
+int16_t getYCenterPosition(String text) {
+  int16_t x1, y1;
+  uint16_t textWidth, textHeight;
+  display.getTextBounds(text, 0, 0, &x1, &y1, &textWidth, &textHeight);
+  return (SCREEN_HEIGHT - textHeight) / 2;
+}
+
+//########### BUZZER ##########
 void playBuzzerShortBeep() {
   digitalWrite(BUZZER_PIN, LOW);
   delay(100);
   digitalWrite(BUZZER_PIN, HIGH);
 }
 
+void playBuzzerLongBeep() {
+   tone(BUZZER_PIN, 300);
+}
+
+void stopBuzzerBeep() {
+  noTone(BUZZER_PIN);
+  digitalWrite(BUZZER_PIN, HIGH); //LOW = ON, HIGH = OFF, idk why
+}
+
+void playDoubleBeep() {
+  playBuzzerShortBeep();
+  delay(100);
+  playBuzzerShortBeep();
+}
+//##################
+
+
+//############ API CALLS ###########
 //Send the action log to the API
 void sendActionLog(String username, String action) {
   if(!username || !action || username == "" || action == "") {
@@ -126,46 +166,37 @@ void sendMovementLog() {
   }
   http.end();
 }
+//####################
 
-void checkForMovement() {
-  pinStatePrevious = pinStateCurrent; // store old state
-  pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);   // read new state
-  if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {   // pin state change: LOW -> HIGH
-    Serial.println("Motion detected!");
-    // TODO: turn on alarm, light or activate a device ... here
-  }
-  else
-  if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {   // pin state change: HIGH -> LOW
-    Serial.println("Motion stopped!");
-    // TODO: turn off alarm, light or deactivate a device ... here
-  }
-}
-
+//set the lock status
 void setLockStatus(boolean status, String username) {
   boolean previousLockStatus = lockStatus;
   lockStatus = status;
   BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
   BuildAuthStatusCharacteristic->notify();
 
+  codeGenerated = false;
   codeCountdown = false;
   connectCode = 0;
   //Update the display data with the current status
   display.clearDisplay();
+  display.setTextSize(1);
   String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
-  display.setCursor(18,0);
+  display.setCursor(getXCenterPosition(lockStatusText),0);
   display.println(lockStatusText);
 
   //display the name and username
   //if the name and username are empty, do not display them
   if(username != "") {
-    display.setCursor(0, 20);
     String message = "User: " + username;
+    display.setCursor(getXCenterPosition(message), 20);
     display.println(message);
   }
 
   //draw the lock/unlock icon
   if(lockStatus == true) {
-    display.drawBitmap(48, 30, lockIcon, 32, 32, WHITE);
+    display.drawBitmap(28, 30, lockIcon, 32, 32, WHITE);
+    display.drawBitmap(68, 30, eyeIcon, 32, 32, WHITE);
   } else {
     display.drawBitmap(48, 30, unlockIcon, 32, 32, WHITE);
   }
@@ -176,9 +207,44 @@ void setLockStatus(boolean status, String username) {
   } else {
     sendActionLog(username, lockStatus ? "locked" : "unlocked");
   }
+
+  if(lockStatus) {
+    playDoubleBeep();
+  } else {
+    playBuzzerShortBeep();
+  }
+}
+
+void checkForMovement() {
+  pinStatePrevious = pinStateCurrent;
+  pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);
+  if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {  //HIGH - DETECTED, LOW - NOTHING IN SIGHT
+    String message = "Motion detected!";
+    Serial.println(message);
+    if(!codeGenerated) {
+      display.clearDisplay();
+      display.setTextSize(1);
+      display.setCursor(getXCenterPosition(message),getYCenterPosition(message));
+      display.println(message);
+      display.display();
+    }
+    playBuzzerLongBeep();
+    sendMovementLog();
+  }
+  else
+  if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {
+    Serial.println("Motion stopped!");  
+    stopBuzzerBeep();
+
+    //if no code is generated, set the lock status to the previous state, it prevents the display deletion when a code is generated on the screen
+    if(!codeGenerated) { 
+      setLockStatus(lockStatus, lastActionUsername);
+    }
+  }
 }
 
 void generateConnectCode() {
+  codeGenerated = true;
   String connectCodeStr = "";
   for (int i = 0; i < 6; i++) {
     connectCodeStr += String(random(1,9));
@@ -202,11 +268,14 @@ void updateCountdown() {
         setLockStatus(lockStatus, lastActionUsername);
       } else {
         display.clearDisplay();
+        display.setTextSize(1);
         display.display();
+
         //display the current lock status
         String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
         display.setCursor(18,0);
         display.println(lockStatusText);
+
         //display the code countdown until it expires               
         String text = "Expires in " + String(codeDuration) + " seconds";
         display.setCursor(0,45);
@@ -281,14 +350,15 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(MOTIONSENSOR_PIN, INPUT);
-  digitalWrite(BUZZER_PIN, HIGH); // Keep buzzer silent
 
+  //set buzzer to off
+  stopBuzzerBeep();
+
+  //initialize the wifi
   initWiFi();
-  Serial.print("RSSI: ");
-  Serial.println(WiFi.RSSI());
 
   //initialize the display
-
+  //set the pins for the display
   DISPLAY_PINS.begin(SDA_PIN, SCL_PIN);
   //initialize the OLED display
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -297,9 +367,9 @@ void setup() {
 
   // clear the display
   display.clearDisplay();
-
-  // Set the text color to white with a black background
   display.setTextColor(WHITE);
+  display.setTextSize(2);
+  display.setCursor(getXCenterPosition("BuildAuth"),getYCenterPosition("BuildAuth"));
   display.println("BuildAuth");
   display.display();
 
@@ -358,5 +428,9 @@ void loop() {
 
   if(lockStatus == true) {
     checkForMovement();
+  }
+
+  if(lockStatus == false) {
+    stopBuzzerBeep();
   }
 }

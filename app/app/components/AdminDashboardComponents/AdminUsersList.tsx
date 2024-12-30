@@ -5,6 +5,7 @@ import theme from "../../theming/theme";
 import { useState } from "react";
 import EditUserDialog from "../Dialogs/EditUserDialog";
 import i18n from "../../localization/locale";
+import convertTimestamp from "../../utils/convertTimestamp";
 
 export default function AdminUsersList() {
     const { usersList, showEditDialog, showDeleteDialog, getUsersList, showCreateDialog } = useAuth();
@@ -60,7 +61,7 @@ export default function AdminUsersList() {
                             <Divider />
                             <List.Item
                                 title="Last Access"
-                                description={user.lastAccess || "Never"}
+                                description={convertTimestamp(user.lastAccess) || "Never"}
                                 left={props => <List.Icon {...props} icon="clock-outline" />}
                             />
                             <Divider />

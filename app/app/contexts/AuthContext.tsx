@@ -18,11 +18,16 @@ interface AuthType {
     logout: () => void;
     getUsersList: () => Promise<void>
     getLogs: () => Promise<void>;
+    getMovements: () => Promise<void>;
     user: User;
     isLoading: boolean;
     isAuthenticated: boolean;
     logs: Array<{
         username: string;
+        timestamp: string;
+        message: string;
+    }>;
+    movements: Array<{
         timestamp: string;
         message: string;
     }>;
@@ -80,11 +85,17 @@ const AuthProvider = ({ children }: any) => {
         message: '',
     }
 
+    let movement = {
+        timestamp: '',
+        message: '',
+    }
+
     const [user, setUser] = React.useState<User>(userInfo);
     const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState('');
     const [logs, setLogs] = React.useState(Array<typeof log>);
+    const [movements, setMovements] = React.useState(Array<typeof movement>);
     const [usersList, setUsersList] = React.useState<User[]>([])
 
     //edit dialog props
@@ -107,8 +118,9 @@ const AuthProvider = ({ children }: any) => {
             }, { timeout: 5000 })
             setUser(response.data.userInfo);
             setAuthenticated(true);
-            getLogs()
-            getUsersList()
+            getLogs();
+            getMovements();
+            getUsersList();
             setLoading(false);
             return "authenticated";
         } catch(error) {
@@ -131,7 +143,7 @@ const AuthProvider = ({ children }: any) => {
         }
     }
 
-    //Get logs
+    //Get movements list
     const getLogs = async() => {
         const response = await axios.get(`${config.apiUrl}/logs/`, { timeout: 5000 })
         let logsData = response.data.map(log => {
@@ -141,7 +153,23 @@ const AuthProvider = ({ children }: any) => {
                 message: log.message,
             }
         })
-        setLogs(logsData);
+
+        //Reverse the logs array so the new logs will be the first ones
+        let rawLogs : Array<typeof log> = logsData;
+        setLogs(rawLogs.toReversed());
+    }
+
+    const getMovements = async() => {
+        const response = await axios.get(`${config.apiUrl}/movements/`, { timeout: 5000 })
+        let movementsResponse = response.data.map(movement => {
+            return {
+                timestamp: movement.timestamp,
+                message: movement.message,
+            }
+        })
+        //Reverse the movements array so the new movements will be the first ones
+        let rawMovements : Array<typeof movement> = movementsResponse;
+        setMovements(rawMovements.toReversed());
     }
 
     //Get users list
@@ -266,10 +294,12 @@ const AuthProvider = ({ children }: any) => {
         logout,
         getUsersList,
         getLogs,
+        getMovements,
         user,
         isLoading, 
         loginMessage,
         logs,
+        movements,
         usersList,
 
         //Edit user

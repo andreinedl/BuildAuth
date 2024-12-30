@@ -5,9 +5,10 @@ import theme from  '../theming/theme'
 //Import components
 import Header from '../components/HomeComponents/HomeHeader'
 import AccessCard from '../components/HomeComponents/AccessCard'
-import AccessLogs from '../components/HomeComponents/AccessLogs'
+import AccessLogs from '../components/HomeComponents/LogsMovementsSwitch'
 import { useEffect } from 'react'
 import { useBluetooth } from '../contexts/BluetoothContext'
+import LogsMovementsSwitch from '../components/HomeComponents/LogsMovementsSwitch'
 import PinModal from '../components/Modals/PinModal'
 
 export default function Home() {
@@ -28,7 +29,7 @@ export default function Home() {
             }}>
                 <Header />
                 <AccessCard />
-                <AccessLogs />
+                <LogsMovementsSwitch />
             </Surface>
             <PinModal/>
         </View>

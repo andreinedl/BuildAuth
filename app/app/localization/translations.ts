@@ -45,6 +45,8 @@ const translations = {
         CreateUserDialogText: "Create User",
         CreateUser: "Create User",
         PinNotValid: "The PIN is not valid",
+        AccessLogs: "Access logs",
+        Movements: "Movements",
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -90,6 +92,8 @@ const translations = {
         CreateUserDialogText: "Creează utilizator",
         CreateUser: "Creează Utilizator",
         PinNotValid: "PIN-ul nu este valid",
+        AccessLogs: "Loguri acces",
+        Movements: "Mișcări",
     }
 }
 

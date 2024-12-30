@@ -1,69 +1,62 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { View, ScrollView } from 'react-native';
-import { List, Surface, Divider, IconButton } from "react-native-paper";
-import Text from "../Text";
-import i18n from "../../localization/locale";
+import React, { useState } from "react";
+import { List, Surface, Divider, Button } from "react-native-paper";
 import theme from "../../theming/theme";
+import convertTimestamp from "../../utils/convertTimestamp";
 
-export default function AccessLogs() {
-    const { logs, getLogs } = useAuth();
+interface Props {
+    visible: boolean;
+}
 
+export default function AccessLogs({ visible }: Props) {
+    const { logs } = useAuth();
     return (
-        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 40 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
-                <Text variant='headlineMedium' textVariant='bold'>
-                    Access logs:
-                </Text>
-
-                <IconButton icon='refresh-circle' onPress={getLogs} size={30}/>
-            </View>
-        
-            <ScrollView 
-                style={{ 
-                    width: "90%", 
-                    height: "40%", 
-                    marginTop: 30,
-                }} 
-                persistentScrollbar={true}
-            >   
-                {/*Reverse the logs array so the new logs will be the first ones*/}
-                {logs.toReversed().map((log, index) => (
-                    <Surface 
-                        key={index}
-                        elevation={2} 
+        <ScrollView 
+            style={{ 
+                width: "90%", 
+                height: "40%", 
+                marginTop: 10,
+                display: visible ? 'flex' : 'none',
+            }} 
+            persistentScrollbar={true}
+        >   
+            {logs.map((log, index) => (
+                <Surface 
+                    key={index}
+                    elevation={2} 
+                    style={{ 
+                        marginBottom: 10,
+                        borderRadius: 12,
+                        overflow: 'hidden'
+                    }}
+                >
+                    <List.Accordion
+                        title={log.username}
+                        left={props => <List.Icon {...props} icon="account-clock" />}
                         style={{ 
-                            marginBottom: 10,
-                            borderRadius: 12,
-                            overflow: 'hidden'
+                            backgroundColor: theme.colors.surface,
+                        }}
+                        titleStyle={{
+                            fontWeight: 'bold'
                         }}
                     >
-                        <List.Accordion
-                            title={log.username}
-                            left={props => <List.Icon {...props} icon="account-clock" />}
-                            style={{ 
-                                backgroundColor: theme.colors.surface,
-                            }}
+                        <Divider />
+                        <List.Item
+                            title={convertTimestamp(log.timestamp)}
+                            description={log.message}
+                            left={props => <List.Icon {...props} icon="message-text" />}
                             titleStyle={{
-                                fontWeight: 'bold'
+                                fontSize: 14,
+                                color: theme.colors.secondary
                             }}
-                        >
-                            <Divider />
-                            <List.Item
-                                title={new Date(log.timestamp).toLocaleString()}
-                                description={log.message}
-                                left={props => <List.Icon {...props} icon="message-text" />}
-                                titleStyle={{
-                                    fontSize: 14,
-                                    color: theme.colors.secondary
-                                }}
-                                descriptionStyle={{
-                                    marginTop: 5
-                                }}
-                            />
-                        </List.Accordion>
-                    </Surface>
-                ))}
-            </ScrollView>
-        </View>
-    );
+                            descriptionStyle={{
+                                marginTop: 5
+                            }}
+                        />
+                    </List.Accordion>
+                </Surface>
+            ))}
+        </ScrollView>
+    )
 }
