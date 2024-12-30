@@ -20,6 +20,7 @@ export const database = new Sequelize({
 
 import { User } from './models/User'
 import { Log } from './models/Log';
+import { Movement } from './models/Movement';
 
 export async function initDb() {
     async function connect() {
@@ -48,5 +49,5 @@ export async function initDb() {
     //sync models
     await User.sync();
     await Log.sync();
-    
+    await Movement.sync();
 }
