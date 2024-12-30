@@ -1,18 +1,21 @@
 import { Sequelize, Model } from 'sequelize'
-export const database = new Sequelize('mariadb://root@localhost:3306', {
+export const database = new Sequelize({
+    host: 'localhost',
+    username: 'root',
+    password: '',
+    port: 3306,
     dialect: 'mariadb',
-    /*dialectOptions: {
-        timezone: 'Europe/Bucharest',
-    },*/
+    dialectOptions: {
+        useUTC: false,
+    },
     database: 'buildauth',
-    timezone: 'Europe/Bucharest',
     logging: false,
     pool: {
         max: 5,
         idle: 30000,
         acquire: 60000,
     },
-
+    timezone: '+02:00'
 })
 
 import { User } from './models/User'

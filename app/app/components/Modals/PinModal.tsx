@@ -6,19 +6,23 @@ import theme from "../../theming/theme";
 import { PaperOtpInput } from 'react-native-paper-otp-input';
 import { useBluetooth } from "../../contexts/BluetoothContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "react-native-paper-toast";
+import i18n from "../../localization/locale";
 
 export default function PinModal() {
     const { modalVisibility, setModalVisibility, sendPIN } = useBluetooth()
     const [otp, setOtp] = useState<string>(null)
     const { user } = useAuth();
+    const toast = useToast()
 
     /*useEffect(() => {
         setModalVisibility(modalVisibility);
     }, [modalVisibility]);*/
 
     const handleSend = () => {
-        if(otp.length < 6) {
-            //todo
+        if(otp.length < 6 || otp.length == undefined) {
+            toast.show({ message: i18n.t('PinNotValid'), duration: 2000, type: 'error' });
+            return;
         } else {
             console.log(user)
             sendPIN(parseInt(otp), user);

@@ -9,11 +9,10 @@
 #include <BLEServer.h>
 #include <BLE2902.h>
 
-#include <SimpleTimer.h>
-
 // Include the libraries for the OLED display
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Wire.h>
 
 //Include the icons
 #include "lockIcon.cpp"
@@ -26,14 +25,17 @@
 #define STATUS_CHARACTERISTIC_UUID "3d46c16c-17ac-45c7-8638-0e75b4fed4e7" //generated using https://www.uuidgenerator.net/
 #define COMMUNICATION_CHARACTERISTIC_UUID "e8fa2592-5b6a-4bfa-8a86-f8dccb89f488" //generated using https://www.uuidgenerator.net/
 #define LED_PIN 5
+#define BUZZER_PIN 4
+#define MOTIONSENSOR_PIN 23
+#define SDA_PIN 32
+#define SCL_PIN 33
 
 //wifi
-const char* ssid = "#########";
-const char* password = "#######";
+const char* ssid = "########";
+const char* password = "###########";
 unsigned long previousMillis = 0;
 unsigned long interval = 30000;
-//Your Domain name with URL path or IP address with path
-const char* serverName = "http://158.101.197.72/api/logs/create";
+const char* apiUrl = "http://158.101.197.72/api/";
 HTTPClient http;
 WiFiClient client;
 
@@ -62,24 +64,37 @@ BLECharacteristic *BuildAuthCommunicationCharacteristic;
 boolean deviceConnected = false;
 boolean oldDeviceConnected = false;
 
-//connect code
 int connectCode;
-
 volatile boolean codeCountdown = false;
-
 String lastActionUsername = "";
 
 //define the screen object
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+TwoWire DISPLAY_PINS = TwoWire(0);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &DISPLAY_PINS, -1);
+
+//Motion sensor
+int pinStateCurrent   = LOW;  // current state of pin
+int pinStatePrevious  = LOW;  // previous state of pin
 
 boolean lockStatus;
 
+int devicesConnected = 0;
+
+void playBuzzerShortBeep() {
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(100);
+  digitalWrite(BUZZER_PIN, HIGH);
+}
+
+//Send the action log to the API
 void sendActionLog(String username, String action) {
   if(!username || !action || username == "" || action == "") {
     return;
   }
 
-  http.begin(client, serverName);
+  String logApiUrl = String(apiUrl) + "logs/create";
+
+  http.begin(client, logApiUrl);
   http.addHeader("Content-Type", "application/json");
   String payload = "{\"username\":\"" + username + "\",\"message\":\"" + action + "\"}";
   int httpResponseCode = http.POST(payload);
@@ -92,6 +107,38 @@ void sendActionLog(String username, String action) {
     Serial.println(httpResponseCode);
   }
   http.end();
+}
+
+void sendMovementLog() {
+  String logApiUrl = String(apiUrl) + "movements/create";
+
+  http.begin(client, logApiUrl);
+  http.addHeader("Content-Type", "application/json");
+  String payload = "{\"message\":\"Movement detected\"}";
+  int httpResponseCode = http.POST(payload);
+  if(httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println(httpResponseCode);
+    Serial.println(response);
+  } else {
+    Serial.print("Error on sending POST: ");
+    Serial.println(httpResponseCode);
+  }
+  http.end();
+}
+
+void checkForMovement() {
+  pinStatePrevious = pinStateCurrent; // store old state
+  pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);   // read new state
+  if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {   // pin state change: LOW -> HIGH
+    Serial.println("Motion detected!");
+    // TODO: turn on alarm, light or activate a device ... here
+  }
+  else
+  if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {   // pin state change: HIGH -> LOW
+    Serial.println("Motion stopped!");
+    // TODO: turn off alarm, light or deactivate a device ... here
+  }
 }
 
 void setLockStatus(boolean status, String username) {
@@ -176,12 +223,24 @@ void updateCountdown() {
 
 class ServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
-    deviceConnected = true;
+    playBuzzerShortBeep();
+    devicesConnected++;
+    if(devicesConnected <= 3) {
+      delay(500);
+      BLEDevice::startAdvertising();
+    }
     digitalWrite(LED_PIN, HIGH);
   };
   void onDisconnect(BLEServer* pServer) {
-    deviceConnected = false;
-    digitalWrite(LED_PIN, LOW);
+    devicesConnected--;
+    if(devicesConnected <= 3) {
+      delay(500);
+      BLEDevice::startAdvertising();
+    }
+
+    if(devicesConnected == 0) {
+      digitalWrite(LED_PIN, LOW);
+    }
   }
 };
 
@@ -218,14 +277,22 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
 void setup() {
   Serial.begin(115200);
 
+  //setup the pins
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(MOTIONSENSOR_PIN, INPUT);
+  digitalWrite(BUZZER_PIN, HIGH); // Keep buzzer silent
+
   initWiFi();
   Serial.print("RSSI: ");
   Serial.println(WiFi.RSSI());
 
   //initialize the display
+
+  DISPLAY_PINS.begin(SDA_PIN, SCL_PIN);
+  //initialize the OLED display
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
+    for(;;);
   }
 
   // clear the display
@@ -236,27 +303,15 @@ void setup() {
   display.println("BuildAuth");
   display.display();
 
-  pinMode(LED_PIN, OUTPUT);
-
   // Init BT
   BLEDevice::init(DEVICE_NAME);
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new ServerCallbacks());
 
-  // Create the service
+  //create the service and the characteristics
   BLEService *BuildAuthService = pServer->createService(SERVICE_UUID);
-
-  // Create the status characteristic
-  BuildAuthStatusCharacteristic = BuildAuthService->createCharacteristic(
-                                         STATUS_CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_NOTIFY
-                                       );
-
-  BuildAuthCommunicationCharacteristic = BuildAuthService->createCharacteristic(
-                                         COMMUNICATION_CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_WRITE
-                                       );
+  BuildAuthStatusCharacteristic = BuildAuthService->createCharacteristic(STATUS_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+  BuildAuthCommunicationCharacteristic = BuildAuthService->createCharacteristic(COMMUNICATION_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
 
   //add callback for the communication characteristic
   BuildAuthCommunicationCharacteristic->setCallbacks(new CommunicationsCharacteristicCallbacks());
@@ -277,7 +332,7 @@ void setup() {
   //Start the BT Service
   BuildAuthService->start();
 
-  // Start advertising
+  //Start advertising
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
@@ -286,24 +341,12 @@ void setup() {
   BLEDevice::startAdvertising();
   Serial.println("Waiting for a client connection to notify...");
 
-  //set the default value for lockstatus
+  //Set the default value for lockstatus
   setLockStatus(true, "");
 }
 
 void loop() {
   updateCountdown();
-  // Handle device connection status
-  if (deviceConnected && !oldDeviceConnected) {
-    // Do stuff here on connecting
-    oldDeviceConnected = deviceConnected;
-  }
-  if (!deviceConnected && oldDeviceConnected) {
-    delay(500); // Give the bluetooth stack the chance to get things ready
-    pServer->startAdvertising(); // Restart advertising
-    Serial.println("Start advertising");
-    oldDeviceConnected = deviceConnected;
-  }
-
   unsigned long currentMillis = millis();
   if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
     Serial.print(millis());
@@ -311,5 +354,9 @@ void loop() {
     WiFi.disconnect();
     WiFi.reconnect();
     previousMillis = currentMillis;
+  }
+
+  if(lockStatus == true) {
+    checkForMovement();
   }
 }

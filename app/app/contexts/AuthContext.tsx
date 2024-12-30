@@ -17,6 +17,7 @@ interface AuthType {
     login: (username: string, password: string) => Promise<String>;
     logout: () => void;
     getUsersList: () => Promise<void>
+    getLogs: () => Promise<void>;
     user: User;
     isLoading: boolean;
     isAuthenticated: boolean;
@@ -264,6 +265,7 @@ const AuthProvider = ({ children }: any) => {
 		login,
         logout,
         getUsersList,
+        getLogs,
         user,
         isLoading, 
         loginMessage,

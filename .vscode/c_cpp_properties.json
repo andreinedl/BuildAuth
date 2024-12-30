@@ -10,8 +10,10 @@
             "includePath": [
                 "C:/Users/Andrei/Documents/Git/BuildAuth/device/include",
                 "C:/Users/Andrei/Documents/Git/BuildAuth/device/src",
-                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/BLE/src",
+                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
+                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
+                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit SSD1306",
                 "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit GFX Library",
                 "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit BusIO",
@@ -224,7 +226,6 @@
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/Ethernet/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/FFat/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/FS/src",
-                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdate/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdateServer/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/I2S/src",
@@ -241,7 +242,6 @@
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                 ""
             ],
@@ -250,8 +250,10 @@
                 "path": [
                     "C:/Users/Andrei/Documents/Git/BuildAuth/device/include",
                     "C:/Users/Andrei/Documents/Git/BuildAuth/device/src",
-                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/BLE/src",
+                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
+                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
+                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit SSD1306",
                     "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit GFX Library",
                     "C:/Users/Andrei/Documents/Git/BuildAuth/device/.pio/libdeps/esp32cam/Adafruit BusIO",
@@ -464,7 +466,6 @@
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/Ethernet/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/FFat/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/FS/src",
-                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdate/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdateServer/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/I2S/src",
@@ -481,7 +482,6 @@
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                    "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "C:/Users/Andrei/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                     ""
                 ]

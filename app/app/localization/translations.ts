@@ -44,6 +44,7 @@ const translations = {
         DeleteUserDialogText: "Are you sure you want to delete this user?",
         CreateUserDialogText: "Create User",
         CreateUser: "Create User",
+        PinNotValid: "The PIN is not valid",
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -88,6 +89,7 @@ const translations = {
         DeleteUserDialogText: "Sunteți sigur că doriți să ștergeți acest utilizator?",
         CreateUserDialogText: "Creează utilizator",
         CreateUser: "Creează Utilizator",
+        PinNotValid: "PIN-ul nu este valid",
     }
 }
 

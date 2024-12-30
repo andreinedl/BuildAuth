@@ -1,18 +1,22 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { View, ScrollView } from 'react-native';
-import { List, Surface, Divider } from "react-native-paper";
+import { List, Surface, Divider, IconButton } from "react-native-paper";
 import Text from "../Text";
 import i18n from "../../localization/locale";
 import theme from "../../theming/theme";
 
 export default function AccessLogs() {
-    const { logs } = useAuth();
+    const { logs, getLogs } = useAuth();
 
     return (
         <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 40 }}>
-            <Text variant='headlineMedium' textVariant='bold'>
-                Access logs:
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
+                <Text variant='headlineMedium' textVariant='bold'>
+                    Access logs:
+                </Text>
+
+                <IconButton icon='refresh-circle' onPress={getLogs} size={30}/>
+            </View>
         
             <ScrollView 
                 style={{ 
@@ -21,8 +25,9 @@ export default function AccessLogs() {
                     marginTop: 30,
                 }} 
                 persistentScrollbar={true}
-            >
-                {logs.map((log, index) => (
+            >   
+                {/*Reverse the logs array so the new logs will be the first ones*/}
+                {logs.toReversed().map((log, index) => (
                     <Surface 
                         key={index}
                         elevation={2} 

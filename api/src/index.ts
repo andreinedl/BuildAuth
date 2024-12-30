@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { initDb } from './database/db';
 import { userRouter } from '../src/routes/UserRoute';
 import { logRouter } from './routes/LogRoute';
+import { movementRouter } from './routes/MovementRoute';
 import helmet from 'helmet';
 import cors from 'cors';
 import audit from 'express-requests-logger'
@@ -26,6 +27,7 @@ app.use(audit())
 //routes
 app.use('/users', userRouter)
 app.use('/logs', logRouter)
+app.use('/movements', movementRouter)
 
 //handle 404
 app.use((req : Request, res : Response, next: NextFunction) => {
