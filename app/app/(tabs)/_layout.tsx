@@ -23,33 +23,47 @@ const AdminDashboardRoute = () => <AdminDashboard />
 export default function TabLayout() {
     const { user } = useAuth()
 
-    const [index, setIndex] = React.useState(0);
-        const [routes] = React.useState([
-        { key: 'home', title: i18n.t('HomeTab'), icon: 'home', focusedIcon: 'home', unfocusedIcon: 'home-outline' },
-        { key: 'userInfo', title: i18n.t('UserInfoTab'), icon: 'account', focusedIcon: 'account', unfocusedIcon: 'account-outline' },
-        { key: 'adminDashboard', title: i18n.t('AdminDashboardTab'), icon: 'cog', focusedIcon: 'cog', unfocusedIcon: 'cog-outline'}
-    ]);
-
-    let renderScene;
     if(user.admin) {
-        renderScene = BottomNavigation.SceneMap({
+        const [index, setIndex] = React.useState(0);
+            const [routes] = React.useState([
+            { key: 'home', title: i18n.t('HomeTab'), icon: 'home', focusedIcon: 'home', unfocusedIcon: 'home-outline' },
+            { key: 'userInfo', title: i18n.t('UserInfoTab'), icon: 'account', focusedIcon: 'account', unfocusedIcon: 'account-outline' },
+            { key: 'adminDashboard', title: i18n.t('AdminDashboardTab'), icon: 'cog', focusedIcon: 'cog', unfocusedIcon: 'cog-outline'}
+        ]);
+
+        const renderScene = BottomNavigation.SceneMap({
             home: HomeRoute,
             userInfo: UserInfoRoute,
             adminDashboard: AdminDashboardRoute
         }); 
+
+        return (
+            <BottomNavigation
+              navigationState={{ index, routes }}
+              onIndexChange={setIndex}
+              renderScene={renderScene}
+              barStyle={{ backgroundColor: theme.colors.background}}
+            />
+        );
     } else {
-        renderScene = BottomNavigation.SceneMap({
+        const [index, setIndex] = React.useState(0);
+            const [routes] = React.useState([
+            { key: 'home', title: i18n.t('HomeTab'), icon: 'home', focusedIcon: 'home', unfocusedIcon: 'home-outline' },
+            { key: 'userInfo', title: i18n.t('UserInfoTab'), icon: 'account', focusedIcon: 'account', unfocusedIcon: 'account-outline' },
+        ]);
+
+        const renderScene = BottomNavigation.SceneMap({
             home: HomeRoute,
             userInfo: UserInfoRoute,
-        });
+        }); 
+
+        return (
+            <BottomNavigation
+              navigationState={{ index, routes }}
+              onIndexChange={setIndex}
+              renderScene={renderScene}
+              barStyle={{ backgroundColor: theme.colors.background}}
+            />
+        );
     }
-       
-    return (
-        <BottomNavigation
-          navigationState={{ index, routes }}
-          onIndexChange={setIndex}
-          renderScene={renderScene}
-          barStyle={{ backgroundColor: theme.colors.background}}
-        />
-    );
 }

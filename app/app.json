@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "access-app",
-    "slug": "access-app",
-    "scheme": "com.andreinedelcu.access-app",
+    "name": "BuildAuth",
+    "slug": "BuildAuth",
+    "scheme": "com.andrein.buildauth",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.andrein.accessapp"
+      "bundleIdentifier": "com.andrein.buildauth"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +28,7 @@
         "android.permission.BLUETOOTH",
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
-      "package": "com.andrein.accessapp"
+      "package": "com.andrein.buildauth"
     },
     "plugins": [
       "expo-router",

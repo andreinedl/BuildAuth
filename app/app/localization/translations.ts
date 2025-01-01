@@ -47,6 +47,7 @@ const translations = {
         PinNotValid: "The PIN is not valid",
         AccessLogs: "Access logs",
         Movements: "Movements",
+        AccountNotAllowedText: "Access denied.",
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -94,6 +95,7 @@ const translations = {
         PinNotValid: "PIN-ul nu este valid",
         AccessLogs: "Loguri acces",
         Movements: "Mișcări",
+        AccountNotAllowedText: "Acces interzis.",
     }
 }
 

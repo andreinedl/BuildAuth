@@ -3,15 +3,18 @@ import { useState, useEffect, useRef } from 'react'
 import BTEnabledCard from './BTEnabledCard'
 import BTDisabledCard from './BTDisabledCard'
 import BTNotSupportedCard from './BTNotSupportedCard'
+import AccountNotAllowedCard from './AccountNotAllowedCard';
 
 //Bluetooth
 import { BtManager } from '../../contexts/BluetoothContext';
 import { useBluetooth } from '../../contexts/BluetoothContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AccessCard() {
     const [bluetoothEnabled, setBluetoothEnabled] = useState<Boolean>()
     const [bluetoothSupported, setBluetoothSupported] = useState<Boolean>()
     const [bluetoothPermissions, setBluetoothPermissions] = useState<Boolean>()
+    const { user } = useAuth();
 
     useEffect(() => {
         const subscription = BtManager.onStateChange((state) => {
@@ -46,17 +49,17 @@ export default function AccessCard() {
         };
       }, [BtManager]);
 
-    return (
-        <>
-            {bluetoothSupported ? (
-                bluetoothEnabled ? (
-                    <BTEnabledCard />
-                ) : (
-                    <BTDisabledCard />
-                )
-            ) : (
-                <BTNotSupportedCard />
-            )}
-        </>
-    )
+    if(user.allowed) {
+        if(bluetoothSupported) {
+            if(bluetoothEnabled) {
+                return <BTEnabledCard />
+            } else {
+                return <BTDisabledCard />
+            }
+        } else {
+            return <BTNotSupportedCard />
+        }
+    } else {
+        return <AccountNotAllowedCard />
+    }
 }

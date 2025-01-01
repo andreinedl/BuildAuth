@@ -1,91 +1,113 @@
-#include <Arduino.h>
-//wifi
-#include <WiFi.h>
-#include "HTTPClient.h"
+//Defines
+// --Screen
+#define SCREEN_WIDTH 128 // px
+#define SCREEN_HEIGHT 64 // px
 
-//Include the libraries for the BLE
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
-#include <BLE2902.h>
-
-// Include the libraries for the OLED display
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Wire.h>
-
-//Include the icons
-#include "lockIcon.cpp"
-#include "unlockIcon.cpp"
-#include "eyeIcon.cpp"
-
-#define SCREEN_WIDTH 128 // pixels
-#define SCREEN_HEIGHT 64 // pixels
+// -- Bluetooth 
 #define DEVICE_NAME "BuildAuth"
 #define SERVICE_UUID "0ffe0862-658c-4783-a3d6-9d31211c795f" //generated using https://www.uuidgenerator.net/
 #define STATUS_CHARACTERISTIC_UUID "3d46c16c-17ac-45c7-8638-0e75b4fed4e7" //generated using https://www.uuidgenerator.net/
 #define COMMUNICATION_CHARACTERISTIC_UUID "e8fa2592-5b6a-4bfa-8a86-f8dccb89f488" //generated using https://www.uuidgenerator.net/
+
+// -- Pins
 #define LED_PIN 5
 #define BUZZER_PIN 4
 #define MOTIONSENSOR_PIN 23
 #define SDA_PIN 32
 #define SCL_PIN 33
 
-//########## WIFI ##########
-const char* ssid = "###########";
-const char* password = "###########";
-unsigned long previousMillis = 0;
-unsigned long interval = 30000;
-const char* apiUrl = "http://158.101.197.72/api/";
+// -- Wifi
+#define WIFI_SSID "BuildAuth"
+#define WIFI_PASSWORD "12345678"
+
+
+// Includes
+// -- BLE
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
+BLEServer *pServer;
+BLECharacteristic *BuildAuthStatusCharacteristic;
+BLECharacteristic *BuildAuthCommunicationCharacteristic;
+
+
+// -- OLED SSD1306
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <Wire.h>
+TwoWire DISPLAY_PINS = TwoWire(0);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &DISPLAY_PINS, -1);
+
+// -- Internet connection
+#include <WiFi.h>
+#include "HTTPClient.h"
 HTTPClient http;
 WiFiClient client;
+const char* logsCreationUrl = "http://158.101.197.72/api/logs/create";
+const char* movementsCreationUrl = "http://158.101.197.72/api/movements/create";
+unsigned long WifiStatusPreviousMillis = 0;
 
+// -- Display icons
+#include "lockIcon.cpp"
+#include "unlockIcon.cpp"
+#include "eyeIcon.cpp"
+
+//Variables
+// -- Motion sensor
+int pinStateCurrent = LOW;  // current state of pin
+int pinStatePrevious = LOW;  // previous state of pin
+// -- Timers
+unsigned long codeGenMillis = 0;
+unsigned long lockMillis = 0;
+int codeDuration = 0;
+// -- Lock status
+boolean lockStatus;
+int devicesConnected = 0;
+String setLockUsername;
+int connectCode;
+
+//Functions
+// -- Buzzer
+void stopSound() {
+  digitalWrite(BUZZER_PIN, HIGH);
+  noTone(BUZZER_PIN);
+}
+
+void playAlarmSound() {
+  tone(BUZZER_PIN, 300);
+}
+
+void playSingleBeep() {
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+}
+
+void playDoubleBeep() {
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(200);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+}
+
+// -- WIFI
 void initWiFi() {
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(1000);
   }
-  Serial.print("RSSI: ");
-  Serial.println(WiFi.RSSI());
 
   if(WiFi.status() == WL_CONNECTED) {
     Serial.println("Connected to the WiFi network");
   }
   Serial.println(WiFi.localIP());
 }
-//####################
 
-//code generation timers
-unsigned long codeGenMillis = 0;
-int codeDuration = 0;
-
-//BT
-BLEServer *pServer;
-BLECharacteristic *BuildAuthStatusCharacteristic;
-BLECharacteristic *BuildAuthCommunicationCharacteristic;
-boolean deviceConnected = false;
-boolean oldDeviceConnected = false;
-
-int connectCode;
-volatile boolean codeCountdown = false;
-String lastActionUsername = "";
-boolean codeGenerated = false;
-
-//define the screen object
-TwoWire DISPLAY_PINS = TwoWire(0);
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &DISPLAY_PINS, -1);
-
-//Motion sensor
-int pinStateCurrent   = LOW;  // current state of pin
-int pinStatePrevious  = LOW;  // previous state of pin
-
-boolean lockStatus;
-
-int devicesConnected = 0;
-
-//Get the centered x position of the text
+// -- Display
 int16_t getXCenterPosition(String text) {
   int16_t x1, y1;
   uint16_t textWidth, textHeight;
@@ -93,7 +115,6 @@ int16_t getXCenterPosition(String text) {
   return (SCREEN_WIDTH - textWidth) / 2;
 }
 
-//Get the centered x position of the text
 int16_t getYCenterPosition(String text) {
   int16_t x1, y1;
   uint16_t textWidth, textHeight;
@@ -101,150 +122,117 @@ int16_t getYCenterPosition(String text) {
   return (SCREEN_HEIGHT - textHeight) / 2;
 }
 
-//########### BUZZER ##########
-void playBuzzerShortBeep() {
-  digitalWrite(BUZZER_PIN, LOW);
-  delay(100);
-  digitalWrite(BUZZER_PIN, HIGH);
+void startupMessage() {
+  display.clearDisplay();
+  display.setTextSize(2);
+  String message = "BuildAuth";
+  display.setCursor(getXCenterPosition(message),getYCenterPosition(message));
+  display.println(message);
+  display.display();
 }
 
-void playBuzzerLongBeep() {
-   tone(BUZZER_PIN, 300);
-}
-
-void stopBuzzerBeep() {
-  noTone(BUZZER_PIN);
-  digitalWrite(BUZZER_PIN, HIGH); //LOW = ON, HIGH = OFF, idk why
-}
-
-void playDoubleBeep() {
-  playBuzzerShortBeep();
-  delay(100);
-  playBuzzerShortBeep();
-}
-//##################
-
-
-//############ API CALLS ###########
-//Send the action log to the API
-void sendActionLog(String username, String action) {
-  if(!username || !action || username == "" || action == "") {
-    return;
-  }
-
-  String logApiUrl = String(apiUrl) + "logs/create";
-
-  http.begin(client, logApiUrl);
-  http.addHeader("Content-Type", "application/json");
-  String payload = "{\"username\":\"" + username + "\",\"message\":\"" + action + "\"}";
-  int httpResponseCode = http.POST(payload);
-  if(httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.println(httpResponseCode);
-    Serial.println(response);
-  } else {
-    Serial.print("Error on sending POST: ");
-    Serial.println(httpResponseCode);
-  }
-  http.end();
-}
-
-void sendMovementLog() {
-  String logApiUrl = String(apiUrl) + "movements/create";
-
-  http.begin(client, logApiUrl);
-  http.addHeader("Content-Type", "application/json");
-  String payload = "{\"message\":\"Movement detected\"}";
-  int httpResponseCode = http.POST(payload);
-  if(httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.println(httpResponseCode);
-    Serial.println(response);
-  } else {
-    Serial.print("Error on sending POST: ");
-    Serial.println(httpResponseCode);
-  }
-  http.end();
-}
-//####################
-
-//set the lock status
-void setLockStatus(boolean status, String username) {
-  boolean previousLockStatus = lockStatus;
-  lockStatus = status;
-  BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
-  BuildAuthStatusCharacteristic->notify();
-
-  codeGenerated = false;
-  codeCountdown = false;
-  connectCode = 0;
-  //Update the display data with the current status
+void setLockDisplay(boolean setStatus) {
   display.clearDisplay();
   display.setTextSize(1);
-  String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
-  display.setCursor(getXCenterPosition(lockStatusText),0);
-  display.println(lockStatusText);
+  display.display();
 
-  //display the name and username
-  //if the name and username are empty, do not display them
-  if(username != "") {
-    String message = "User: " + username;
-    display.setCursor(getXCenterPosition(message), 20);
-    display.println(message);
+  //Header text
+  String headerText = "Status: " + String(setStatus ? "Locked" : "Unlocked");
+  display.setCursor(getXCenterPosition(headerText),0);
+  display.println(headerText);
+
+  //Action user display text
+  if(setLockUsername != "") {
+    String userText = "User: " + String(setLockUsername);
+    display.setCursor(getXCenterPosition(userText),20);
+    display.println(userText);
   }
 
-  //draw the lock/unlock icon
-  if(lockStatus == true) {
+  //Lock / unlock icon
+  if(setStatus == true) {
     display.drawBitmap(28, 30, lockIcon, 32, 32, WHITE);
     display.drawBitmap(68, 30, eyeIcon, 32, 32, WHITE);
   } else {
     display.drawBitmap(48, 30, unlockIcon, 32, 32, WHITE);
   }
-  display.display();
-  
-  if(username == lastActionUsername && previousLockStatus == lockStatus) {
-    return;
-  } else {
-    sendActionLog(username, lockStatus ? "locked" : "unlocked");
-  }
 
-  if(lockStatus) {
-    playDoubleBeep();
-  } else {
-    playBuzzerShortBeep();
+  display.display();
+
+  if(setStatus == true) {
+    lockMillis = millis();
   }
 }
 
-void checkForMovement() {
-  pinStatePrevious = pinStateCurrent;
-  pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);
-  if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {  //HIGH - DETECTED, LOW - NOTHING IN SIGHT
-    String message = "Motion detected!";
-    Serial.println(message);
-    if(!codeGenerated) {
-      display.clearDisplay();
-      display.setTextSize(1);
-      display.setCursor(getXCenterPosition(message),getYCenterPosition(message));
-      display.println(message);
-      display.display();
-    }
-    playBuzzerLongBeep();
-    sendMovementLog();
-  }
-  else
-  if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {
-    Serial.println("Motion stopped!");  
-    stopBuzzerBeep();
+// -- API Calls
+boolean sendPostRequest(String url, String bodyContent) {
+  int retries = 0;
+  while(retries < 3) {
+    http.begin(client, url);
+    http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = http.POST(bodyContent);
+    if(httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(httpResponseCode);
+      Serial.println(response);
+      http.end();
 
-    //if no code is generated, set the lock status to the previous state, it prevents the display deletion when a code is generated on the screen
-    if(!codeGenerated) { 
-      setLockStatus(lockStatus, lastActionUsername);
+      if(httpResponseCode == 200 || httpResponseCode == 201) return true;
     }
+    Serial.println("POST Error: " + String(httpResponseCode));
+    http.end();
+
+    retries++;
+    delay(1000);
   }
+  return false;
+}
+
+void sendActionLog(String username, String action) {
+    if(username == "" || action == "" || !username || !action ) return;
+
+    String bodyContent = "{\"username\":\"" + username + "\",\"message\":\"" + action + "\"}";
+    if(sendPostRequest(logsCreationUrl, bodyContent)) {
+      Serial.println("Action log POST sent");
+    } else {
+      Serial.println("Action log POST failed");
+    }
+}
+
+void sendMovementLog() {
+    String bodyContent = "{\"message\":\"Movement detected\"}";
+
+    if(sendPostRequest(movementsCreationUrl, bodyContent)) {
+      Serial.println("Action log POST sent");
+    } else {
+      Serial.println("Action log POST failed");
+    }
+}
+
+// Lock
+void setLockStatus(boolean setStatus, String statusSetUser = setLockUsername) {
+  boolean previousLockStatus = lockStatus;
+  lockStatus = setStatus;
+  BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
+  BuildAuthStatusCharacteristic->notify();
+
+  connectCode = 0;
+  codeDuration = 0;
+  Serial.print(statusSetUser);
+
+  if(statusSetUser != "") {
+    sendActionLog(statusSetUser, lockStatus ? "Locked" : "Unlocked");
+  }
+
+  if(lockStatus == true) {
+    playSingleBeep();
+  } else {
+    playDoubleBeep();
+  }
+
+  setLockDisplay(lockStatus);
 }
 
 void generateConnectCode() {
-  codeGenerated = true;
   String connectCodeStr = "";
   for (int i = 0; i < 6; i++) {
     connectCodeStr += String(random(1,9));
@@ -252,34 +240,33 @@ void generateConnectCode() {
   connectCode = connectCodeStr.toInt();
   Serial.println(connectCode);
 
-  codeCountdown = true;
   codeDuration = 30; //seconds
   codeGenMillis = millis();
 }
 
 void updateCountdown() {
-  if (codeCountdown) {
+  if (codeDuration != 0) {
     unsigned long currentMillis = millis();    
     if (currentMillis - codeGenMillis >= 1000) {
       codeGenMillis = currentMillis;
       codeDuration--;
       
       if (codeDuration <= 0) {
-        setLockStatus(lockStatus, lastActionUsername);
+        setLockStatus(lockStatus);
       } else {
         display.clearDisplay();
         display.setTextSize(1);
-        display.display();
+        display.setTextColor(WHITE);
 
         //display the current lock status
-        String lockStatusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
+        String statusText = "Status: " + String(lockStatus ? "Locked" : "Unlocked");
         display.setCursor(18,0);
-        display.println(lockStatusText);
+        display.println(statusText);
 
         //display the code countdown until it expires               
-        String text = "Expires in " + String(codeDuration) + " seconds";
+        String countdownText = "Expires in " + String(codeDuration) + " seconds";
         display.setCursor(0,45);
-        display.println(text);
+        display.println(countdownText);
     
         //display the connect code
         display.setCursor(40,25);
@@ -290,12 +277,46 @@ void updateCountdown() {
   }
 }
 
+// Movement
+void checkForMovement() {
+  delay(500);
+
+  if(millis() - lockMillis < 3000) {
+    return;
+  } else {
+    pinStatePrevious = pinStateCurrent;
+    pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);
+    if(connectCode == 0 && codeDuration == 0) {
+      if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {  //HIGH - DETECTED, LOW - NOTHING IN SIGHT
+        String message = "Motion detected!";
+        Serial.println(message);
+
+        //display popup
+        display.clearDisplay();
+        display.setTextSize(1);
+        display.setCursor(getXCenterPosition(message),getYCenterPosition(message));
+        display.println(message);
+        display.display();
+
+        playAlarmSound();
+        sendMovementLog();
+      }
+      else if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {
+        Serial.println("Motion stopped!"); 
+        setLockDisplay(lockStatus);
+        stopSound();
+      }
+    }
+  }
+}
+
+// Bluetooth callbacks
+// -- BT server callbacks
 class ServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
-    playBuzzerShortBeep();
     devicesConnected++;
     if(devicesConnected <= 3) {
-      delay(500);
+      delay(500); //small delay to let bluetooth get ready
       BLEDevice::startAdvertising();
     }
     digitalWrite(LED_PIN, HIGH);
@@ -303,7 +324,7 @@ class ServerCallbacks: public BLEServerCallbacks {
   void onDisconnect(BLEServer* pServer) {
     devicesConnected--;
     if(devicesConnected <= 3) {
-      delay(500);
+      delay(500); //small delay to let bluetooth get ready
       BLEDevice::startAdvertising();
     }
 
@@ -313,6 +334,7 @@ class ServerCallbacks: public BLEServerCallbacks {
   }
 };
 
+// -- BT characteristics callbacks
 class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) override {
     std::string value = pCharacteristic->getValue();
@@ -335,7 +357,7 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
           Serial.print(username.c_str());
           Serial.print("\n");
 
-          lastActionUsername = username;
+          setLockUsername = username;
           setLockStatus(!lockStatus, username);
         }
       }
@@ -346,32 +368,24 @@ class CommunicationsCharacteristicCallbacks : public BLECharacteristicCallbacks 
 void setup() {
   Serial.begin(115200);
 
-  //setup the pins
+  //Setup the pins
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(MOTIONSENSOR_PIN, INPUT);
 
-  //set buzzer to off
-  //stopBuzzerBeep();
-
-  //initialize the wifi
   initWiFi();
 
-  //initialize the display
-  //set the pins for the display
+  //Initialize the display
+  // -- Set the pins for the display
   DISPLAY_PINS.begin(SDA_PIN, SCL_PIN);
-  //initialize the OLED display
+  // -- Initialize the OLED display
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     for(;;);
   }
-
-  // clear the display
-  display.clearDisplay();
   display.setTextColor(WHITE);
-  display.setTextSize(2);
-  display.setCursor(getXCenterPosition("BuildAuth"),getYCenterPosition("BuildAuth"));
-  display.println("BuildAuth");
-  display.display();
+
+  // Startup display message
+  startupMessage();
 
   // Init BT
   BLEDevice::init(DEVICE_NAME);
@@ -409,29 +423,24 @@ void setup() {
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
-  Serial.println("Waiting for a client connection to notify...");
 
-  //Set the default value for lockstatus
-  setLockStatus(false, "");
+  //Set the default lock value;
+  setLockStatus(false);
 }
 
 void loop() {
-  updateCountdown();
-  unsigned long currentMillis = millis();
-  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
-    Serial.print(millis());
+  if(codeDuration > 0 && connectCode != 0 ) updateCountdown();
+
+  if(lockStatus == true && connectCode == 0) {
+    checkForMovement();
+  }
+  
+  //Wifi connection check
+  unsigned long WifiStatusCurrentMillis = millis();
+  if ((WiFi.status() != WL_CONNECTED) && (WifiStatusCurrentMillis - WifiStatusPreviousMillis >= 30000)) {
     Serial.println("Reconnecting to WiFi...");
     WiFi.disconnect();
     WiFi.reconnect();
-    previousMillis = currentMillis;
-  }
-
-  if(lockStatus == true && codeGenerated == false) {
-    checkForMovement();
-  }
-
-  if(lockStatus == false) {
-    noTone(BUZZER_PIN);
-    digitalWrite(BUZZER_PIN, HIGH);
+    WifiStatusPreviousMillis = WifiStatusCurrentMillis;
   }
 }
