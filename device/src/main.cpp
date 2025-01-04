@@ -61,6 +61,7 @@ int pinStatePrevious = LOW;  // previous state of pin
 unsigned long codeGenMillis = 0;
 unsigned long lockMillis = 0;
 int codeDuration = 0;
+int lockMovementDelayDuration = 0;
 // -- Lock status
 boolean lockStatus;
 int devicesConnected = 0;
@@ -157,10 +158,6 @@ void setLockDisplay(boolean setStatus) {
   }
 
   display.display();
-
-  if(setStatus == true) {
-    lockMillis = millis();
-  }
 }
 
 // -- API Calls
@@ -230,6 +227,12 @@ void setLockStatus(boolean setStatus, String statusSetUser = setLockUsername) {
   }
 
   setLockDisplay(lockStatus);
+  lockMovementDelayDuration = 5;
+
+  if(lockStatus == true) {
+    delay(1000);
+    lockMillis = millis();
+  }
 }
 
 void generateConnectCode() {
@@ -279,34 +282,47 @@ void updateCountdown() {
 
 // Movement
 void checkForMovement() {
-  delay(500);
+  unsigned long currentMillis = millis();
 
-  if(millis() - lockMillis < 3000) {
-    return;
-  } else {
-    pinStatePrevious = pinStateCurrent;
-    pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);
-    if(connectCode == 0 && codeDuration == 0) {
-      if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {  //HIGH - DETECTED, LOW - NOTHING IN SIGHT
-        String message = "Motion detected!";
-        Serial.println(message);
-
-        //display popup
-        display.clearDisplay();
-        display.setTextSize(1);
-        display.setCursor(getXCenterPosition(message),getYCenterPosition(message));
-        display.println(message);
-        display.display();
-
-        playAlarmSound();
-        sendMovementLog();
-      }
-      else if (pinStatePrevious == HIGH && pinStateCurrent == LOW) {
-        Serial.println("Motion stopped!"); 
-        setLockDisplay(lockStatus);
-        stopSound();
-      }
+  // Check if delay period is active
+  if (lockMovementDelayDuration > 0) {
+    pinStatePrevious = LOW; //reset the movement state
+    pinStateCurrent = LOW;
+    if (currentMillis - lockMillis >= 1000) { // 1 second has passed
+      lockMillis = currentMillis;
+      lockMovementDelayDuration--;
+      Serial.println("Movement check blocked by delay: " + String(lockMovementDelayDuration));
     }
+    return;
+  }
+
+  // Ensure movement detection is only active when no code is being entered
+  if (connectCode != 0 || codeDuration > 0) {
+    return;
+  }
+
+  // Read the current state of the motion sensor
+  pinStatePrevious = pinStateCurrent;
+  pinStateCurrent = digitalRead(MOTIONSENSOR_PIN);
+
+  if (pinStatePrevious == LOW && pinStateCurrent == HIGH) {  // Motion detected
+    String message = "Motion detected!";
+    Serial.println(message);
+
+    // Display popup
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(getXCenterPosition(message), getYCenterPosition(message));
+    display.println(message);
+    display.display();
+
+    playAlarmSound();
+    sendMovementLog();
+  }
+  else if (pinStatePrevious == HIGH && pinStateCurrent == LOW) { // Motion stopped
+    Serial.println("Motion stopped!"); 
+    setLockDisplay(lockStatus);
+    stopSound();
   }
 }
 
@@ -429,13 +445,15 @@ void setup() {
 }
 
 void loop() {
-  if(codeDuration > 0 && connectCode != 0 ) updateCountdown();
+  if (codeDuration > 0 && connectCode != 0) {
+    updateCountdown();
+  }
 
-  if(lockStatus == true && connectCode == 0) {
+  if (lockStatus == true && connectCode == 0 && lockMillis != 0) {
     checkForMovement();
   }
   
-  //Wifi connection check
+  // Wifi connection check
   unsigned long WifiStatusCurrentMillis = millis();
   if ((WiFi.status() != WL_CONNECTED) && (WifiStatusCurrentMillis - WifiStatusPreviousMillis >= 30000)) {
     Serial.println("Reconnecting to WiFi...");

@@ -14,7 +14,6 @@
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "mariadb": "^3.4.0",
-    "mysql2": "^3.11.4",
     "sequelize": "6.37.5",
     "express-requests-logger": "4.0.1"
   },
