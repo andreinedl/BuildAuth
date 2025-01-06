@@ -20,7 +20,6 @@
 #define WIFI_SSID "BuildAuth"
 #define WIFI_PASSWORD "12345678"
 
-
 // Includes
 // -- BLE
 #include <BLEDevice.h>
@@ -42,10 +41,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &DISPLAY_PINS, -1);
 // -- Internet connection
 #include <WiFi.h>
 #include "HTTPClient.h"
+#include <WiFiClientSecure.h>
 HTTPClient http;
 WiFiClient client;
-const char* logsCreationUrl = "http://158.101.197.72/api/logs/create";
-const char* movementsCreationUrl = "http://158.101.197.72/api/movements/create";
+const char* logsCreationUrl = "http://buildauth.andreinedelcu.eu.org/api/logs/create";
+const char* movementsCreationUrl = "http://buildauth.andreinedelcu.eu.org/api/movements/create";
 unsigned long WifiStatusPreviousMillis = 0;
 
 // -- Display icons
@@ -95,6 +95,8 @@ void playDoubleBeep() {
 
 // -- WIFI
 void initWiFi() {
+  stopSound();
+  
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -212,6 +214,7 @@ void setLockStatus(boolean setStatus, String statusSetUser = setLockUsername) {
   BuildAuthStatusCharacteristic->setValue(lockStatus ? "true" : "false");
   BuildAuthStatusCharacteristic->notify();
 
+  //disable the connect code
   connectCode = 0;
   codeDuration = 0;
   Serial.print(statusSetUser);
@@ -255,7 +258,11 @@ void updateCountdown() {
       codeDuration--;
       
       if (codeDuration <= 0) {
-        setLockStatus(lockStatus);
+        setLockDisplay(lockStatus);
+
+        //disable the connect code
+        connectCode = 0;
+        codeDuration = 0;
       } else {
         display.clearDisplay();
         display.setTextSize(1);
