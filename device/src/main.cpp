@@ -229,6 +229,8 @@ void setLockStatus(boolean setStatus, String statusSetUser = setLockUsername) {
     playDoubleBeep();
   }
 
+  if(lockStatus == false) stopSound();
+
   setLockDisplay(lockStatus);
   lockMovementDelayDuration = 5;
 
@@ -245,6 +247,7 @@ void generateConnectCode() {
   }
   connectCode = connectCodeStr.toInt();
   Serial.println(connectCode);
+  stopSound();
 
   codeDuration = 30; //seconds
   codeGenMillis = millis();

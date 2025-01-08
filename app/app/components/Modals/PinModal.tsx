@@ -46,7 +46,7 @@ export default function PinModal() {
                 <View style={styles.content}>
                     <Text variant="headlineMedium" textVariant="bold">PIN</Text>
                     <Text variant="titleMedium" textVariant="normal" style={{ marginTop: 15 }}>
-                        Please enter the PIN displayed on the screen:
+                        {i18n.t('PleaseEnterPin')}
                     </Text>
                     <PaperOtpInput 
                         maxLength={6} 
@@ -63,7 +63,7 @@ export default function PinModal() {
                         theme={{ roundness: 2 }} 
                         style={styles.unlockButton}
                     >
-                        Unlock
+                        {i18n.t('Submit')}
                     </Button>
                     <Button onPress={() => closeModal()} style={styles.closeButton} buttonColor="white" theme={{ roundness: 2 }}>Close</Button>
                 </View>

@@ -48,6 +48,8 @@ const translations = {
         AccessLogs: "Access logs",
         Movements: "Movements",
         AccountNotAllowedText: "Access denied.",
+        PleaseEnterPin: "Please enter the PIN displayed on the screen:",
+        Submit: "Submit"
     },
     ro: {
         LoginGreetingH1: 'Salut 👋',
@@ -96,6 +98,8 @@ const translations = {
         AccessLogs: "Loguri acces",
         Movements: "Mișcări",
         AccountNotAllowedText: "Acces interzis.",
+        PleaseEnterPin: "Te rog sa introduci codul PIN ce este afisat pe ecran",
+        Submit: "Trimite"
     }
 }
 
