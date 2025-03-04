@@ -33,6 +33,7 @@ Used libraries:
 In the ``app`` directory run ``npm run build-android``.
 
 **Screenshots:**
+
 <img src="https://i.imgur.com/R0mOZw7.jpeg" width=200> <img src="https://i.imgur.com/l53dEQ7.jpeg" width=200> <img src="https://i.imgur.com/QshaGJ4.jpeg" width=200> <img src="https://i.imgur.com/VTaYrZD.jpeg" width=200>
 
 ## API server
