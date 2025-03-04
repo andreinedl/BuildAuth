@@ -13,10 +13,10 @@
 ## Hardware parts
 | Part | Image |
 | ------------- | ------------- |
-| HC-SR501 PIR Sensor  | ![HC-SR501 PIR Sensor](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLhsupLZDAN6ut_Hbs8-72XEEJCEhBqPumRg&s =150x)  |
-| SSD1306 Display  | ![SSD1306 Display](https://docs.sunfounder.com/projects/umsk/en/latest/_images/27_OLED.png =150x)  |
-| Active buzzer | ![Active buzzer](https://eph.com.pk/wp-content/uploads/2024/06/ssive-buzzer-module-for-arduino-new-diy-kit_3_.jpg =150x)|
-|ESP32 | ![ESP32](https://s13emagst.akamaized.net/products/70974/70973239/images/res_ab0cc32c3a43b799d40afecc4c9ed9c6.jpg =150x)
+| HC-SR501 PIR Sensor  | <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLhsupLZDAN6ut_Hbs8-72XEEJCEhBqPumRg&s" width=150>  |
+| SSD1306 Display  | <img src="https://docs.sunfounder.com/projects/umsk/en/latest/_images/27_OLED.png" width=150>  |
+| Active buzzer | <img src="https://eph.com.pk/wp-content/uploads/2024/06/ssive-buzzer-module-for-arduino-new-diy-kit_3_.jpg" width=150>|
+|ESP32 | <img src="https://s13emagst.akamaized.net/products/70974/70973239/images/res_ab0cc32c3a43b799d40afecc4c9ed9c6.jpg" width=150>
 
 ## Android app
 The mobile application for this project is used to set the device status by users, with each user having their own account. It also allows viewing logs of detected movements and status changes ("Locked"/"Unlocked").
@@ -33,7 +33,7 @@ Used libraries:
 In the ``app`` directory run ``npm run build-android``.
 
 **Screenshots:**
-![](https://i.imgur.com/R0mOZw7.jpeg =200x)       ![](https://i.imgur.com/l53dEQ7.jpeg =200x) ![](https://i.imgur.com/QshaGJ4.jpeg =200x) ![](https://i.imgur.com/VTaYrZD.jpeg =200x)
+<img src="https://i.imgur.com/R0mOZw7.jpeg" width=200> <img src="https://i.imgur.com/l53dEQ7.jpeg" width=200> <img src="https://i.imgur.com/QshaGJ4.jpeg" width=200> <img src="https://i.imgur.com/VTaYrZD.jpeg" width=200>
 
 ## API server
 
